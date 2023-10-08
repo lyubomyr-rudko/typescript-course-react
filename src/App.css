@@ -2,3 +2,13 @@
   height: 32px;
   border-bottom: 1px solid #eaecef;
 }
+.userRow{
+  width:400px;
+  display: flex;
+}
+.userName{
+  width:'200px';
+}
+.firstButton{
+  margin-left: auto;
+}
