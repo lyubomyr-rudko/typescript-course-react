@@ -1,40 +1,76 @@
-import usersData from "../users-data";
-import { TUser } from "../users-data";
+import usersData from '../users-data';
+import { TUser } from '../users-data';
+import {
+    Section,
+    Title,
+    Container,
+    Table,
+    Thead,
+    Tbody,
+    HairColorIcon,
+} from './Users-homework.styled';
 
 interface IUserProps {
-  data: TUser;
+    data: TUser;
 }
-// TODO: Update User component to display user's name, Gender, Hair color, Birth dat and phone number
-// TODO: Style this component using styled-components
-// TODO: Use Users-homework.jpg or Users-homework.fig as a reference
-// TODO: Add a component to display user's hair color as a colored circle HairColorIcon
-// TODO: Add a color prop to HairColorIcon, so it can be used to display different colors
-// TODO: Add your styled-components to src/lesson13/Users-homework.styled.tsx
 
-const User = (props: IUserProps) => {
-  const { data } = props;
+const User = ({ data }: IUserProps) => {
+    const { firstName, lastName, birthDate, gender, hair, phone } = data;
+    const formateBirthDate = new Date(birthDate).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+    });
+    return (
+        <tr>
+            <td>
+                {firstName} {lastName}
+            </td>
+            <td>{gender}</td>
+            <td>
+                <HairColorIcon color={hair.color.toLowerCase()} />
+            </td>
+            <td>{formateBirthDate}</td>
+            <td>{phone}</td>
+        </tr>
+    );
+};
 
-  return (
-    <li>
-      {data.firstName} {data.lastName}
-    </li>
-  );
+const UserTable = () => {
+    const thead = [
+        'User Name',
+        'Gender',
+        'Hair Color',
+        'Birth date',
+        'Phone number',
+    ];
+    return (
+        <Table>
+            <Thead>
+                <tr>
+                    {thead.map((el) => (
+                        <th key={el}>{el}</th>
+                    ))}
+                </tr>
+            </Thead>
+            <Tbody>
+                {usersData.map((user) => (
+                    <User data={user} key={user.id} />
+                ))}
+            </Tbody>
+        </Table>
+    );
 };
 
 export function Users() {
-  // TOOD: update this component to display a header and a list of users
-  // User Name | Gender | Hair Color | Birth date | Phone number
-  // TODO: Style this component using styled-components
-  // TODO: Use Users-homework.jpg or Users-homework.fig as a reference
-  // TODO: Add your styled-components to src/lesson13/Users-homework.styled.tsx
-
-  return (
-    <ul>
-      {usersData.map((user) => (
-        <User data={user} key={user.id} />
-      ))}
-    </ul>
-  );
+    return (
+        <Section>
+            <Container>
+                <Title>Users</Title>
+                <UserTable />
+            </Container>
+        </Section>
+    );
 }
 
 export default Users;
