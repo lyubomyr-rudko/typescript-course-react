@@ -1,8 +1,8 @@
-import "./App.css";
-import { Users } from "./lesson13/Users";
+import './App.css';
+import { Users } from './lesson13/Users-homework';
 
 export function App() {
-  return <Users />;
+    return <Users />;
 }
 
 export default App;
