@@ -117,7 +117,24 @@ const Form = (props: IFormProps) => {
     newUser?.hair?.color,
     newUser?.birthDate,
   ];
-  const formValidate = formFields.some((field) => field === "");
+  const formInvalid = formFields.some((field) => field === "");
+
+  const checkUserEmail = (email: string) => {
+    const doubleDots = email.match(/[.]{2,}/g);
+    const startWithDot = email.match(/^[.]/);
+    const nameAbuse = email.match(/^abuse[@]/);
+    const namePostmaster = email.match(/^postmaster[@]/);
+    const correctLength = email.match(/^.{1,30}[@]\w{2,9}[.]\w{2,9}$/);
+    const specialSymbols = email.match(/[&=+<>,_'-\s]/g);
+    if (doubleDots) return true;
+    else if (startWithDot) return true;
+    else if (nameAbuse) return true;
+    else if (namePostmaster) return true;
+    else if (!correctLength) return true;
+    else if (specialSymbols) return true;
+    else return false;
+  };
+  const emailInvalid = checkUserEmail(newUser.email);
   return (
     <form action="" onSubmit={handleFormSubmit}>
       <input
@@ -154,6 +171,7 @@ const Form = (props: IFormProps) => {
         required
       />
       <input
+        style={{ backgroundColor: emailInvalid ? "pink" : "white" }}
         type="email"
         onChange={handleNewUserChangeInfo}
         value={newUser.email}
@@ -169,7 +187,7 @@ const Form = (props: IFormProps) => {
         name="gender"
         checked={newUser.gender === "female"}
       />
-      <button type="submit" disabled={formValidate}>
+      <button type="submit" disabled={emailInvalid || formInvalid}>
         Submit
       </button>
       <button type="button" onClick={() => setNewUser(null)}>
