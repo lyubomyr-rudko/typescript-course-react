@@ -2,7 +2,20 @@ import usersData from "../users-data";
 import { TUser } from "../users-data";
 import { HairType, InfoWrapper, RowHeader, Table, TableRow } from "./Users-homework.styled";
 
-type TCategory = Pick<TUser, "firstName" | "lastName" | "gender" | "birthDate" | "phone" | "hair">;
+const categorys = [
+  { category: "firstName", text: "User Name" },
+  { category: "age", text: "Age" },
+  { category: "email", text: "Email" },
+  { category: "gender", text: "Gender" },
+  { category: "hair", text: "Hair Color" },
+  { category: "birthDate", text: "Birth Date" },
+  { category: "phone", text: "Phone Number" },
+] as const;
+
+type TCategory = Pick<
+  TUser,
+  "firstName" | "lastName" | "gender" | "birthDate" | "phone" | "hair" | "age" | "email"
+>;
 interface IUserProps {
   data: TUser;
   category: keyof TCategory;
@@ -10,7 +23,7 @@ interface IUserProps {
 
 const User = (props: IUserProps) => {
   const { data, category } = props;
-  const Info =
+  const info =
     category === "firstName" ? (
       data.lastName + " " + data.firstName
     ) : category === "hair" ? (
@@ -18,17 +31,10 @@ const User = (props: IUserProps) => {
     ) : (
       data[category]
     );
-  return <InfoWrapper>{Info}</InfoWrapper>;
+  return <InfoWrapper>{info}</InfoWrapper>;
 };
 
 export function Users() {
-  const categorys = [
-    { category: "firstName", text: "User Name" },
-    { category: "gender", text: "Gender" },
-    { category: "hair", text: "Hair Color" },
-    { category: "birthDate", text: "Birth Date" },
-    { category: "phone", text: "Phone Number" },
-  ] as const;
   return (
     <Table>
       {categorys.map((category, index) => (
