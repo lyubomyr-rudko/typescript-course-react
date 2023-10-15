@@ -1,5 +1,7 @@
 import usersData from "../users-data";
 import { TUser } from "../users-data";
+import {Container, HairColor, SubContainer, SubContainerHeader, ContainerHeader, ContainerTablename } from "./Users-homework.styled"
+import styles from "./Users.module.css"
 
 interface IUserProps {
   data: TUser;
@@ -15,9 +17,31 @@ const User = (props: IUserProps) => {
   const { data } = props;
 
   return (
-    <li>
-      {data.firstName} {data.lastName}
-    </li>
+      <Container>
+        <SubContainer>
+          <span className={`${styles.dataContainer} ${styles.firstElement}`}>{data.firstName} {data.lastName}</span>
+          <span className={styles.dataContainer}>{data.gender}</span>
+          <span className={styles.dataContainer}><HairColor color={data.hair.color}/></span>
+          <span className={styles.dataContainer}>{data.birthDate}</span>
+          <span className={styles.dataContainer}>{data.phone}</span>
+        </SubContainer>
+      </Container>
+  );
+};
+
+const Header = () => {
+
+
+  return (
+      <ContainerHeader>
+        <SubContainerHeader>
+          <span className={styles.dataContainer}>User Name</span>
+          <span className={styles.dataContainer}>Gender</span>
+          <span className={styles.dataContainer}>Hair Color</span>
+          <span className={styles.dataContainer}>Birth date</span>
+          <span className={styles.dataContainer}>Phone number</span>
+        </SubContainerHeader>
+      </ContainerHeader>
   );
 };
 
@@ -29,11 +53,13 @@ export function Users() {
   // TODO: Add your styled-components to src/lesson13/Users-homework.styled.tsx
 
   return (
-    <ul>
+    <div className={styles.mainContainer}>
+      <ContainerTablename><div className={styles.dataContainer}>Users</div></ContainerTablename>
+      <Header/>
       {usersData.map((user) => (
         <User data={user} key={user.id} />
       ))}
-    </ul>
+    </div>
   );
 }
 
