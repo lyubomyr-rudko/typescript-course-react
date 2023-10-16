@@ -3,10 +3,6 @@
   line-height: 1.5;
   font-weight: 400;
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -27,4 +23,51 @@ body {
   min-width: 320px;
   min-height: 100vh;
 }
+
+.modal {
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  background: rgba(0, 0, 0, .3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+}
+
+.modal__inner {
+  padding: 15px;
+  border-radius: 3px;
+  background: white;
+  width: 500px;
+}
+
+.modal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 15px;
+  margin: 0 -15px;
+  border-bottom: 1px solid gray;
+}
+
+.modal__title {
+  padding-left: 15px;
+  font-size: 20px;
+}
+
+.modal__btn-holder {
+  padding-right: 15px;
+}
+
+.modal__close-btn {
+  cursor: pointer;
+}
+
+.modal__content {
+  padding: 40px 0 0 0;
+}
+
 
