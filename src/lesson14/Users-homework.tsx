@@ -1,9 +1,9 @@
-import usersData from "../users-data";
-import { TUser } from "../users-data";
-
-interface IUserProps {
-  data: TUser;
-}
+import {IUserProps, TAppContext} from "./types.ts";
+import {HairColorPreview, TableCell, TableRow} from "./Users-homework.styled.tsx";
+import {getDateString} from "./utils.ts";
+import {useContext} from "react";
+import Button from "./components/Button.tsx"
+import {AppContext} from "../App.tsx";
 
 // # Users list and form with api
 
@@ -26,24 +26,56 @@ interface IUserProps {
 // 7. Form submit button of the form component should be disabled if form is invalid
 // 8. Show error message for invalid fields
 
-const User = (props: IUserProps) => {
-  const { data } = props;
+const UserRow = ({user, index, lastIndex }: IUserProps) => {
+  const { firstName, lastName, birthDate, gender, hair: {color}, phone,} = user
+  const phoneToDisplay: string = phone && phone.replace(/[+' ']/g,'')
+  const birthDateToDisplay: string = getDateString(birthDate)
+
+  const { onMoveUser } = useContext<TAppContext>(AppContext)
 
   return (
-    <li>
-      {data.firstName} {data.lastName}
-    </li>
+    <TableRow>
+      <TableCell>{firstName} {lastName}</TableCell>
+      <TableCell>{gender}</TableCell>
+      <TableCell>
+        <HairColorPreview color={color}></HairColorPreview>
+      </TableCell>
+      <TableCell>{birthDateToDisplay}</TableCell>
+      <TableCell>{phoneToDisplay}</TableCell>
+      <TableCell>
+        <Button
+          text='Move Up'
+          onClick={() => onMoveUser(index, 'up')}
+          disabled={index === 0}
+        />
+      </TableCell>
+      <TableCell>
+        <Button
+          text='Move Down'
+          onClick={() => onMoveUser(index, 'down')}
+          disabled={index === lastIndex}
+        />
+      </TableCell>
+    </TableRow>
   );
 };
 
-export function Users() {
+const TableBody = () => {
+  const {users,onMoveUser} = useContext<TAppContext>(AppContext)
+
   return (
-    <ul>
-      {usersData.map((user) => (
-        <User data={user} key={user.id} />
-      ))}
-    </ul>
+    <tbody>
+    {users.map((user, idx, array) => (
+      <UserRow
+        user={user}
+        moveUser={onMoveUser}
+        key={user.id}
+        index={idx}
+        lastIndex={array.length - 1}
+      />
+    ))}
+    </tbody>
   );
 }
 
-export default Users;
+export default TableBody;
