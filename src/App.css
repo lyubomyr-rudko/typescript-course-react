@@ -2,3 +2,19 @@
   height: 32px;
   border-bottom: 1px solid #eaecef;
 }
+button:hover {
+  background-color: orangered;
+  color: white;
+}
+button[disabled]:hover {
+  color: #6d6d6d;
+  background-color: #f4f4f6;
+  border: 2px solid black;
+}
+button[disabled] {
+  background-color: #f4f4f6;
+}
+body {
+  background-color: white;
+  color: black;
+}

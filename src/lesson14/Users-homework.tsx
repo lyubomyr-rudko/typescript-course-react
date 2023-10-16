@@ -1,7 +1,21 @@
 import { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import { TUser } from "../users-data";
+import {
+  AddNewUserForm,
+  Button,
+  FormFieldWrapper,
+  FormWrapper,
+  HairType,
+  HeaderWrapper,
+  InfoWrapper,
+  Legend,
+  Loading,
+  Table,
+  TableFieldWrapper,
+} from "./Users-homework.styled";
 
 const userHairOptions = ["Blond", "Black", "Brown", "Chestnut", "Auburn"];
+const tableHeaders = ["Name", "Gender", "Email", "Birthdate", "Hair color", "Navigate"];
 const emptyUser = {
   id: 0,
   firstName: "",
@@ -74,8 +88,8 @@ interface IFormProps {
   newUser: TUser;
   handleFormSubmit: (e: FormEvent<HTMLFormElement>) => void;
   handleNewUserChangeInfo: (e: ChangeEvent<HTMLInputElement>) => void;
-  handleChangeHairColor: (e: ChangeEvent<HTMLSelectElement>) => void;
-  handleChangeGender: (e: ChangeEvent<HTMLInputElement>) => void;
+  handleNewUserChangeHairColor: (e: ChangeEvent<HTMLSelectElement>) => void;
+  handleNewUserChangeGender: (e: ChangeEvent<HTMLInputElement>) => void;
   setNewUser: (user: TUser | null) => void;
 }
 // # Users list and form with api
@@ -96,16 +110,16 @@ interface IFormProps {
 //    2. User last name is required ++
 //    3. User email is required and should be valid email ++
 //    4. User birthDate is required and should be valid date ++
-// 7. Form submit button of the form component should be disabled if form is invalid
-// 8. Show error message for invalid fields
+// 7. Form submit button of the form component should be disabled if form is invalid ++
+// 8. Show error message for invalid fields ++
 
 const Form = (props: IFormProps) => {
   const {
     newUser,
     handleFormSubmit,
     handleNewUserChangeInfo,
-    handleChangeHairColor,
-    handleChangeGender,
+    handleNewUserChangeHairColor,
+    handleNewUserChangeGender,
     setNewUser,
   } = props;
 
@@ -136,64 +150,87 @@ const Form = (props: IFormProps) => {
   };
   const emailInvalid = checkUserEmail(newUser.email);
   return (
-    <form action="" onSubmit={handleFormSubmit}>
-      <input
-        type="text"
-        onChange={handleNewUserChangeInfo}
-        name="firstName"
-        value={newUser.firstName}
-        required
-        placeholder="First Name"
-      />
-      <input
-        type="text"
-        onChange={handleNewUserChangeInfo}
-        name="lastName"
-        value={newUser.lastName}
-        required
-        placeholder="Last Name"
-      />
-      <select onChange={handleChangeHairColor} value={newUser.hair.color}>
-        <option value="" disabled defaultChecked>
-          Please choose hair color
-        </option>
-        {userHairOptions.map((color) => (
-          <option key={color} value={color}>
-            {color}
+    <AddNewUserForm action="" onSubmit={handleFormSubmit}>
+      <FormFieldWrapper>
+        <Legend>First Name</Legend>
+        <input
+          type="text"
+          onChange={handleNewUserChangeInfo}
+          name="firstName"
+          value={newUser.firstName}
+          required
+          placeholder="First Name"
+        />
+      </FormFieldWrapper>
+      <FormFieldWrapper>
+        <Legend>Last Name</Legend>
+        <input
+          type="text"
+          onChange={handleNewUserChangeInfo}
+          name="lastName"
+          value={newUser.lastName}
+          required
+          placeholder="Last Name"
+        />
+      </FormFieldWrapper>
+      <FormFieldWrapper>
+        <Legend>Color of hair</Legend>
+        <select onChange={handleNewUserChangeHairColor} value={newUser.hair.color}>
+          <option value="" disabled defaultChecked>
+            Please choose hair color
           </option>
-        ))}
-      </select>
-      <input
-        type="date"
-        onChange={handleNewUserChangeInfo}
-        value={newUser.birthDate}
-        name="birthDate"
-        required
-      />
-      <input
-        style={{ backgroundColor: emailInvalid ? "pink" : "white" }}
-        type="email"
-        onChange={handleNewUserChangeInfo}
-        value={newUser.email}
-        name="email"
-        required
-        placeholder="Email"
-      />
-      <label>Is female?</label>
-      <input
-        type="checkbox"
-        onChange={handleChangeGender}
-        value={newUser.gender}
-        name="gender"
-        checked={newUser.gender === "female"}
-      />
-      <button type="submit" disabled={emailInvalid || formInvalid}>
-        Submit
-      </button>
-      <button type="button" onClick={() => setNewUser(null)}>
-        Cancel
-      </button>
-    </form>
+          {userHairOptions.map((color) => (
+            <option key={color} value={color}>
+              {color}
+            </option>
+          ))}
+        </select>
+      </FormFieldWrapper>
+      <FormFieldWrapper>
+        <Legend>Birthdate</Legend>
+        <input
+          type="date"
+          onChange={handleNewUserChangeInfo}
+          value={newUser.birthDate}
+          name="birthDate"
+          required
+        />
+      </FormFieldWrapper>
+      <FormFieldWrapper>
+        <Legend>Email</Legend>
+        <input
+          style={{ backgroundColor: emailInvalid ? "pink" : "white" }}
+          type="email"
+          onChange={handleNewUserChangeInfo}
+          value={newUser.email}
+          name="email"
+          required
+          placeholder="Email"
+        />
+        <div style={{ marginLeft: 10 }}>Email{emailInvalid ? " incorrect" : " correct"}</div>
+      </FormFieldWrapper>
+      <FormFieldWrapper>
+        <Legend>Is female?</Legend>
+        <div style={{ display: "flex" }}>
+          <input
+            type="checkbox"
+            onChange={handleNewUserChangeGender}
+            value={newUser.gender}
+            name="gender"
+            checked={newUser.gender === "female"}
+          />
+          <div style={{ color: "black", marginLeft: 5 }}>{newUser.gender}</div>
+        </div>
+      </FormFieldWrapper>
+      <div style={{ textAlign: "center" }}>
+        <Button type="submit" disabled={emailInvalid || formInvalid}>
+          Submit
+        </Button>
+        <Button type="button" onClick={() => setNewUser(null)}>
+          Cancel
+        </Button>
+      </div>
+    </AddNewUserForm>
   );
 };
 
@@ -201,15 +238,36 @@ const User = (props: IUserProps) => {
   const { data, usersListLength, index, setNewOrderOfUsers } = props;
   return (
     <>
-      <li>
-        {data.firstName} {data.lastName}
-      </li>
-      <button disabled={index <= 0} onClick={() => setNewOrderOfUsers(data.id, -1)}>
-        Up
-      </button>
-      <button disabled={index >= usersListLength} onClick={() => setNewOrderOfUsers(data.id, 1)}>
-        Down
-      </button>
+      <TableFieldWrapper>
+        <InfoWrapper>
+          <li>
+            {data.firstName} {data.lastName}
+          </li>
+        </InfoWrapper>
+        <InfoWrapper>
+          <li>{data.gender}</li>
+        </InfoWrapper>
+        <InfoWrapper>
+          <li>{data.email}</li>
+        </InfoWrapper>
+        <InfoWrapper>
+          <li>{data.birthDate}</li>
+        </InfoWrapper>
+        <InfoWrapper>
+          <HairType color={data.hair.color}></HairType>
+        </InfoWrapper>
+        <InfoWrapper>
+          <Button disabled={index <= 0} onClick={() => setNewOrderOfUsers(data.id, -1)}>
+            Up
+          </Button>
+          <Button
+            disabled={index >= usersListLength}
+            onClick={() => setNewOrderOfUsers(data.id, 1)}
+          >
+            Down
+          </Button>
+        </InfoWrapper>
+      </TableFieldWrapper>
     </>
   );
 };
@@ -273,7 +331,7 @@ export function Users() {
         body: JSON.stringify(updatedUser2),
       });
       setUsersList(updatedUsersList);
-      await later(500);
+      await later(200);
     } catch (e) {
       console.error(e);
       alert("something go wrong");
@@ -309,7 +367,7 @@ export function Users() {
     }
     setNewUser({ ...newUser, [e.target.name]: e.target.value });
   };
-  const handleChangeHairColor = (e: ChangeEvent<HTMLSelectElement>) => {
+  const handleNewUserChangeHairColor = (e: ChangeEvent<HTMLSelectElement>) => {
     if (!newUser) {
       return;
     }
@@ -322,7 +380,7 @@ export function Users() {
       },
     });
   };
-  const handleChangeGender = (e: ChangeEvent<HTMLInputElement>) => {
+  const handleNewUserChangeGender = (e: ChangeEvent<HTMLInputElement>) => {
     if (!newUser) {
       return;
     }
@@ -330,28 +388,34 @@ export function Users() {
     setNewUser({ ...newUser, [e.target.name]: value });
   };
   return (
-    <ul>
+    <>
       {isLoading ? (
-        <div>Loading</div>
+        <Loading>Loading</Loading>
       ) : (
         <>
-          <div>
-            {newUser ? (
+          {newUser && (
+            <FormWrapper>
               <Form
                 newUser={newUser}
                 handleFormSubmit={handleFormSubmit}
                 handleNewUserChangeInfo={handleNewUserChangeInfo}
-                handleChangeHairColor={handleChangeHairColor}
-                handleChangeGender={handleChangeGender}
+                handleNewUserChangeHairColor={handleNewUserChangeHairColor}
+                handleNewUserChangeGender={handleNewUserChangeGender}
                 setNewUser={setNewUser}
               />
-            ) : (
-              <div>
-                <button onClick={addNewUser}>Add new User</button>
-              </div>
-            )}
-          </div>
-          <div>
+            </FormWrapper>
+          )}
+          <Table>
+            <TableFieldWrapper>
+              <Button onClick={addNewUser} disabled={newUser !== null}>
+                Add new User
+              </Button>
+            </TableFieldWrapper>
+            <TableFieldWrapper>
+              {tableHeaders.map((header) => (
+                <HeaderWrapper>{header}</HeaderWrapper>
+              ))}
+            </TableFieldWrapper>
             {usersList.map((user, index) => (
               <User
                 data={user}
@@ -361,10 +425,10 @@ export function Users() {
                 index={index}
               />
             ))}
-          </div>
+          </Table>
         </>
       )}
-    </ul>
+    </>
   );
 }
 

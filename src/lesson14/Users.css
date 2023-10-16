@@ -1,10 +1,12 @@
 .error {
-    font-weight: bold;
-    color: pink;
+  font-weight: bold;
+  color: pink;
 }
 
 .danger {
-    font-weight: bold;
-    color: red;
+  font-weight: bold;
+  color: red;
 }
-
+legend {
+  color: black;
+}
