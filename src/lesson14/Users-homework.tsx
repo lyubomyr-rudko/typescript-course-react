@@ -1,9 +1,9 @@
-import usersData from "../users-data";
-import { TUser } from "../users-data";
-
-interface IUserProps {
-  data: TUser;
-}
+import { useState, useEffect } from "react";
+import { IUser, IUserProps, IUserForm } from "./types";
+import {Container, HairColor, SubContainer, SubContainerHeader, ContainerHeader, ContainerTablename } from "./Users-homework.styled"
+import styles from "./Users.module.css"
+import Spinner from "./spiner";
+import Form from "./newUserForm"
 
 // # Users list and form with api
 
@@ -30,20 +30,112 @@ const User = (props: IUserProps) => {
   const { data } = props;
 
   return (
-    <li>
-      {data.firstName} {data.lastName}
-    </li>
+      <Container>
+        <SubContainer>
+          <span className={`${styles.dataContainer} ${styles.firstElement}`}>{data.firstName} {data.lastName}</span>
+          <span className={styles.dataContainer}>{data.gender}</span>
+          <span className={styles.dataContainer}><HairColor color={data.hair.color}/></span>
+          <span className={styles.dataContainer}>{data.birthDate}</span>
+          <span className={styles.dataContainer}>{data.phone}</span>
+          <span className={styles.dataContainer}><button style={{width:'30px', height:'30px'}} onClick={() => props.up(data.id)}>UP</button></span>
+        </SubContainer>
+      </Container>
+  );
+};
+
+const Header = () => {
+
+
+  return (
+      <ContainerHeader>
+        <SubContainerHeader>
+          <span className={styles.dataContainer}>User Name</span>
+          <span className={styles.dataContainer}>Gender</span>
+          <span className={styles.dataContainer}>Hair Color</span>
+          <span className={styles.dataContainer}>Birth date</span>
+          <span className={styles.dataContainer}>Phone number</span>
+        </SubContainerHeader>
+      </ContainerHeader>
   );
 };
 
 export function Users() {
+  const [usersList, setUsersList] = useState<IUser[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [newUserForm, setNewUserForm] = useState<boolean>(false);
+
+
+  useEffect(() => {
+    if(!loading) setLoading(true);
+    getUsers();
+    setLoading(false);
+  }, []);
+
+
+  const getUsers = async ()=>{
+    const response = await fetch("http://localhost:3008/users?_sort=position&_order=desc");
+    const data = await response.json();
+    setUsersList(data);
+  }
+
+  const setUp = async (id:number)=>{
+    let newIndex = 1;
+    if(usersList[0].position){
+      newIndex = usersList[0].position + 1;
+    }
+    await fetch(`http://localhost:3008/users/${id}`,
+    {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        position: newIndex,
+      }),
+    });
+    await getUsers()
+  }
+
+  const addUser = async (data:IUserForm)=>{
+    await fetch(`http://localhost:3008/users/`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+    await getUsers()
+  }
+
+
+  const getUpMediator = async (id:number)=>{
+    setLoading(true);
+    await setUp(id);
+    setLoading(false);
+  }
+  const addNewUserMediator = async (data:IUserForm)=>{
+    setNewUserForm(false)
+    setLoading(true);
+    await addUser(data);
+    setLoading(false);
+  }
+
+
   return (
-    <ul>
-      {usersData.map((user) => (
-        <User data={user} key={user.id} />
+    <div className={styles.mainContainer}>
+      <ContainerTablename>
+        <div className={styles.dataContainer}>Users</div>
+        <button style={{width:'70px', height:'30px'}} onClick={() => setNewUserForm(true)}>Add new</button>
+      </ContainerTablename>
+      <Header/>
+      {loading? <Spinner/> : usersList.map((user) => (
+        <User data={user} key={user.id} up={getUpMediator}/>
       ))}
-    </ul>
+      {newUserForm && <Form submit={addNewUserMediator} close={()=>setNewUserForm(false)}/>}
+    </div>
   );
 }
 
 export default Users;
+
