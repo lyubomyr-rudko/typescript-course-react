@@ -38,7 +38,7 @@ function UserForm(props:IUserFormProps) {
     },
   ];
   
-  const setUserProperty = (properuty:keyof IUserForm, value:TValues)=>{
+  const setUserProperty = <K extends keyof IUserForm>(properuty:K, value:IUserForm[K]):void=>{
     setUser((user)=>{
       return {
         ...user,
@@ -130,7 +130,7 @@ function UserForm(props:IUserFormProps) {
         <div>
         
         <input type="email" id="email" pattern=".+@gmail\.com" size={30} 
-          onChange={(e)=>{setUserProperty('email',{color:e.target.value})}} required />
+          onChange={(e)=>{setUserProperty('email',e.target.value)}} required />
           <label htmlFor="email">Enter your email</label>
         </div>
         <button type="submit">Submit</button>
