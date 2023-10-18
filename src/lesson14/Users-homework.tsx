@@ -111,11 +111,11 @@ function ModalAddUser() {
   } = useForm({ resolver: yupResolver(userSchema) });
 
   type newUser = {
+    gender?: boolean | undefined;
     firstName: string;
     lastName: string;
-    hairColor: ('black' | 'yellow' | 'brown' | 'red') | (string & {});
+    hairColor: NonNullable<'black' | 'yellow' | 'brown' | 'red' | undefined>;
     birthDate: Date;
-    gender: boolean;
     email: string;
   };
 
