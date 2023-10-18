@@ -1,16 +1,13 @@
-import { useState } from "react";
-import "./App.css";
-import { Users } from "./lesson14/Users";
+import './App.css';
+import { Users } from './lesson14/Users-homework';
+import { UsersProvaider } from './lesson14/components/UsersContext/UsersContext';
 
 export function App() {
-  const [show, setShow] = useState(true);
-
-  return (
-    <>
-      <button onClick={() => setShow(!show)}>Toggle</button>
-      {show ? <Users /> : null}
-    </>
-  );
+    return (
+        <UsersProvaider>
+            <Users />
+        </UsersProvaider>
+    );
 }
 
 export default App;
