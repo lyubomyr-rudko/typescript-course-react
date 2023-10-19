@@ -22,7 +22,7 @@ const AddUserForm = () => {
     const [formData, setFormData] = useState<typeof initialState>(initialState);
     const [errors, setErrors] = useState<ValidationError | null>(null);
     const [isErrorsShown, setIsErrorsShown] = useState<boolean>(false);
-    const [isDataValed, setIsDataValed] = useState<boolean>(false);
+    const [isDataValid, setIsDataValid] = useState<boolean>(false);
     const { usersCount, handleAddUser } = useContext(UsersContext);
 
     const handleChange = useCallback(
@@ -42,7 +42,7 @@ const AddUserForm = () => {
             await validationSchema.validate(formData, {
                 abortEarly: false,
             });
-            setIsDataValed(true);
+            setIsDataValid(true);
         } catch (err) {
             if (err instanceof ValidationError) {
                 setErrors(err);
@@ -51,13 +51,13 @@ const AddUserForm = () => {
                     setIsErrorsShown(false);
                 }, 2000);
             }
-            setIsDataValed(false);
+            setIsDataValid(false);
         }
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (isDataValed) return;
+        if (isDataValid) return;
 
         const newFormData = {
             firstName: formData.firstName,
@@ -127,7 +127,7 @@ const AddUserForm = () => {
             </Label>
             {errors && isErrorsShown && <ErrorMessage errors={errors} />}
             <button onClick={handleValidate}>Validate</button>
-            <button disabled={!isDataValed}>Submit</button>
+            <button disabled={!isDataValid}>Submit</button>
         </Form>
     );
 };
