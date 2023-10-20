@@ -98,3 +98,11 @@ export const Select = styled.select`
   color: black;
   margin: 10px;
 `;
+
+export const ButtonSubmit = styled.button`
+  background-color: white;
+  color: black;
+  :hover {
+    color: blue;
+  }
+`;

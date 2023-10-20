@@ -2,6 +2,7 @@ const data = {
   users: [
     {
       id: 1,
+      number: 1,
       firstName: 'Terry',
       lastName: 'Medhurst',
       maidenName: 'Smitham',

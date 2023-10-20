@@ -1,5 +1,5 @@
 // import usersData from "../users-data";
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { TUser } from '../users-data';
 import {
   Container,
@@ -17,6 +17,7 @@ import {
   Label,
   Input,
   Select,
+  ButtonSubmit,
 } from './Users-homework.styled';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -69,7 +70,7 @@ const User = (props: IUserProps) => {
 
   return (
     <>
-      <List>{data.id}</List>
+      <List>{data.number}</List>
       <List>
         {data.firstName} {data.lastName}
       </List>
@@ -87,7 +88,7 @@ const User = (props: IUserProps) => {
   );
 };
 
-function ModalAddUser() {
+function ModalAddUser({ usersData }: any) {
   const mailRegx =
     /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
   let userSchema = yup.object({
@@ -111,6 +112,7 @@ function ModalAddUser() {
   } = useForm({ resolver: yupResolver(userSchema) });
 
   type newUser = {
+    id?: number;
     gender?: boolean | undefined;
     firstName: string;
     lastName: string;
@@ -122,6 +124,7 @@ function ModalAddUser() {
   function onSubmit(userData: newUser): void {
     const newUser = {
       ...userData,
+      number: usersData.length + 1,
       hair: {
         color: userData.hairColor,
       },
@@ -143,9 +146,18 @@ function ModalAddUser() {
     });
     location.reload();
   }
+
+  const [disable, setDisable] = useState<boolean>(true);
+  useMemo(() => {
+    if (Object.keys(errors).length) {
+      setDisable(true);
+    } else {
+      setDisable(false);
+    }
+  }, [errors]);
   return (
     <ModalContainer>
-      <UserForm onSubmit={handleSubmit(onSubmit)}>
+      <UserForm onBlur={handleSubmit(onSubmit)}>
         <Label>
           First name*
           <Input {...register('firstName')} />
@@ -183,7 +195,7 @@ function ModalAddUser() {
           <Input type='email' {...register('email')} />
           <p>{errors.email?.message}</p>
         </Label>
-        <button>Add user</button>
+        <ButtonSubmit disabled={disable}>Add user</ButtonSubmit>
       </UserForm>
     </ModalContainer>
   );
@@ -194,6 +206,17 @@ export function Users() {
   const fetchUsers = async function () {
     const request = await fetch('http://localhost:3000/users');
     const data = await request.json();
+    data.sort((a: TUser, b: TUser) => {
+      if (a.number === undefined || b.number === undefined) {
+        return;
+      }
+      if (a.number < b.number) {
+        return -1;
+      } else if (a.number > b.number) {
+        return +1;
+      }
+      return 0;
+    });
     setUsersData(data);
   };
 
@@ -201,67 +224,54 @@ export function Users() {
     fetchUsers();
   }, []);
 
-  function handleMoveUp(user: number) {
-    if (user === 1) {
+  const handleMoveUp = async (id: number) => {
+    const dataCurrent = await fetch(`http://localhost:3000/users/${id}`);
+    const currentUser = await dataCurrent.json();
+    const dataPrev = await fetch(`http://localhost:3000/users/${id - 1}`);
+    const prevUser = await dataPrev.json();
+    if (currentUser.number === 1) {
       return;
     }
-    const result = [...usersData];
-    const moved = result.filter((el) => el.id === user);
-    result.splice(
-      usersData.findIndex((el) => el.id === user),
-      1
-    );
-    result.splice(usersData.findIndex((el) => el.id === user) - 1, 0, moved[0]);
-    let number = 1;
-    result.map((el) => {
-      el.id = number;
-      number++;
+    await fetch(`http://localhost:3000/users/${id}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ number: currentUser.number - 1 }),
     });
-    function fetchUp() {
-      result.map((user) => {
-        fetch(`http://localhost:3000/users/${user.id}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(user),
-        });
-      });
-      fetchUsers();
-    }
+    await fetch(`http://localhost:3000/users/${id - 1}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ number: prevUser.number + 1 }),
+    });
+    fetchUsers();
+  };
 
-    fetchUp();
-  }
-
-  const handleMoveDown = (user: number) => {
-    if (user === usersData.length) {
+  const handleMoveDown = async (id: number) => {
+    const dataCurrent = await fetch(`http://localhost:3000/users/${id}`);
+    const currentUser = await dataCurrent.json();
+    const dataNext = await fetch(`http://localhost:3000/users/${id + 1}`);
+    const nextUser = await dataNext.json();
+    if (nextUser.number === usersData.length) {
       return;
     }
-    const result = [...usersData];
-    const moved = usersData.filter((el) => el.id === user);
-    result.splice(
-      usersData.findIndex((el) => el.id === user),
-      1
-    );
-    result.splice(usersData.findIndex((el) => el.id === user) + 1, 0, moved[0]);
-    let number = 1;
-    result.map((el) => {
-      el.id = number;
-      number++;
+    await fetch(`http://localhost:3000/users/${id + 1}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ number: nextUser.number - 1 }),
     });
-    function fetchDown() {
-      result.map((user) => {
-        fetch(`http://localhost:3000/users/${user.id}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(user),
-        });
-      });
-      fetchUsers();
-    }
-    fetchDown();
+    await fetch(`http://localhost:3000/users/${id}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ number: currentUser.number + 1 }),
+    });
+    fetchUsers();
   };
 
   const [modal, setModal] = useState(false);
@@ -279,7 +289,7 @@ export function Users() {
         <Container>
           <HeadText>Users</HeadText>
           <button onClick={click}>Add new user</button>
-          {modal ? <ModalAddUser /> : null}
+          {modal ? <ModalAddUser usersData={usersData} /> : null}
           <HeaderList>
             <HeaderSublist>Id</HeaderSublist>
             <HeaderSublist>User Name</HeaderSublist>
