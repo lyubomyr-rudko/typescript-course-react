@@ -1,52 +1,29 @@
-// import { useId, useState } from "react";
+import {ChangeEvent, ChangeEventHandler, useState} from "react";
 import "./App.css";
-import { CustomHookDemo } from "./lesson15/CustomHookDemo";
-// import { UseDeferredValueDemo } from "./lesson16/UseDeferredValueDemo";
-// import { UseReducerDemo } from "./lesson16/UseReducerDemo";
-// import { UseIdDemo } from "./lesson16/UseIdDemo";
-// import { RefProblemDemo } from "./lesson16/UseImperativeHandleDemo";
-// import { UseImperativeHandleDemo } from "./lesson16/UseImperativeHandleDemo";
-// import { UseMemoDemo } from "./lesson15/UseMemoDemo";
-// import { UseRefDemo } from "./lesson15/UseRefDemo";
-// import { LoginForm } from "./lesson15/UseCallbackDemo";
-// import { Users } from "./lesson15/UseContextDemo";
-// import { StateProvider } from "./lesson15/StateContext";
-
-// interface IUserForm {
-//   email: string;
-//   password: string;
-// }
+import {UseStateDemo} from "./lesson16/hw16/UseStateDemo.tsx";
+import {ContextConsumerDemo} from "./lesson16/hw16/ContextConsumerDemo.tsx";
+import {UseContextDemo} from "./lesson16/hw16/UseContextDemo.tsx";
+import {UseCallBackDemo} from "./lesson16/hw16/UseCallBackDemo.tsx";
+import {UseReducerDemo} from "./lesson16/hw16/UseReducerDemo.tsx";
 
 export function App() {
+  const [name, setName] = useState<string>('')
+  const nameInputHandler: ChangeEventHandler<HTMLInputElement> = (e:ChangeEvent<HTMLInputElement>):void => {
+    setName(e.target.value)
+  }
   return (
     <>
-      {/* <LoginForm onSubmit={console.log} /> */}
-      {/* <UseRefDemo /> */}
-      {/* <UseMemoDemo /> */}
-      {/* <StateProvider>
-        <Users />
-      </StateProvider> */}
-      {/* <UseIdDemo />
-      <UseIdDemo />
-      <Xyz />
-      <Xyz />
-      <Xyz />
-      <Xyz />
-      <UseIdDemo /> */}
-      {/* <RefProblemDemo /> */}
-      {/* <UseImperativeHandleDemo /> */}
-      {/* <UseDeferredValueDemo /> */}
-
-      {/* <UseReducerDemo /> */}
-      <CustomHookDemo />
+      <UseStateDemo
+        value={name}
+        onChange={nameInputHandler}
+      />
+      <UseContextDemo context={{name}}>
+        <ContextConsumerDemo />
+      </UseContextDemo>
+      <UseCallBackDemo />
+      <UseReducerDemo />
     </>
   );
 }
-
-// const Xyz = () => {
-//   const id = useId();
-
-//   return <div>{id}</div>;
-// };
 
 export default App;
