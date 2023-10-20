@@ -18,6 +18,7 @@ const userHairOptions = ["Blond", "Black", "Brown", "Chestnut", "Auburn"];
 const tableHeaders = ["Name", "Gender", "Email", "Birthdate", "Hair color", "Navigate"];
 const emptyUser = {
   id: 0,
+  position: 0,
   firstName: "",
   lastName: "",
   maidenName: "",
@@ -257,12 +258,12 @@ const User = (props: IUserProps) => {
           <HairType color={data.hair.color}></HairType>
         </InfoWrapper>
         <InfoWrapper>
-          <Button disabled={index <= 0} onClick={() => setNewOrderOfUsers(data.id, -1)}>
+          <Button disabled={index <= 0} onClick={() => setNewOrderOfUsers(data.position, -1)}>
             Up
           </Button>
           <Button
             disabled={index >= usersListLength}
-            onClick={() => setNewOrderOfUsers(data.id, 1)}
+            onClick={() => setNewOrderOfUsers(data.position, 1)}
           >
             Down
           </Button>
@@ -301,36 +302,34 @@ export function Users() {
   }, []);
 
   const addNewUser = () => {
-    setNewUser({ ...emptyUser, id: usersList.length + 1 });
+    setNewUser({ ...emptyUser, position: usersList.length + 1, id: usersList.length + 1 });
   };
-  async function setNewOrderOfUsers(id: number, number: -1 | 1) {
-    const user = usersList.find((user) => user.id === id);
+  async function setNewOrderOfUsers(position: number, number: -1 | 1) {
+    const user = usersList.find((user) => user.position === position);
     if (!user) return null;
-    const user2 = usersList.find((user) => user.id === id + number);
+    const user2 = usersList.find((user) => user.position === position + number);
     if (!user2) return null;
-    const updatedUser = { ...user, id: id + number };
-    const updatedUser2 = { ...user2, id: id };
-    const filteredUsersList = usersList.filter((user) => user.id !== id && user.id !== id + number);
-    const updatedUsersList = [...filteredUsersList, updatedUser, updatedUser2].sort((a, b) =>
-      a.id > b.id ? 1 : -1
-    );
     try {
       setIsLoading(true);
-      await fetch(`http://localhost:3004/users/${id + number}`, {
-        method: "PUT",
+      await fetch(`http://localhost:3004/users/${user.id}`, {
+        method: "PATCH",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(updatedUser),
+        body: JSON.stringify({
+          position: user2.position,
+        }),
       });
-      await fetch(`http://localhost:3004/users/${id}`, {
-        method: "PUT",
+      await fetch(`http://localhost:3004/users/${user2.id}`, {
+        method: "PATCH",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(updatedUser2),
+        body: JSON.stringify({
+          position: user.position,
+        }),
       });
-      setUsersList(updatedUsersList);
+      fetchUsers();
       await later(200);
     } catch (e) {
       console.error(e);
@@ -351,7 +350,7 @@ export function Users() {
         },
         body: JSON.stringify(newUser),
       });
-      setUsersList([...usersList, newUser]);
+      fetchUsers();
       await later(500);
     } catch (e) {
       console.error(e);
@@ -387,6 +386,17 @@ export function Users() {
     const value = e.target.checked ? "female" : "male";
     setNewUser({ ...newUser, [e.target.name]: value });
   };
+
+  function compare(a: number | string, b: number | string): number {
+    if (a < b) {
+      return -1;
+    }
+    if (a > b) {
+      return 1;
+    }
+    return 0;
+  }
+  console.log(usersList);
   return (
     <>
       {isLoading ? (
@@ -413,18 +423,20 @@ export function Users() {
             </TableFieldWrapper>
             <TableFieldWrapper>
               {tableHeaders.map((header) => (
-                <HeaderWrapper>{header}</HeaderWrapper>
+                <HeaderWrapper key={header}>{header}</HeaderWrapper>
               ))}
             </TableFieldWrapper>
-            {usersList.map((user, index) => (
-              <User
-                data={user}
-                key={user.id}
-                setNewOrderOfUsers={setNewOrderOfUsers}
-                usersListLength={usersList.length - 1}
-                index={index}
-              />
-            ))}
+            {usersList
+              .sort((a, b) => compare(a.position, b.position))
+              .map((user, index) => (
+                <User
+                  data={user}
+                  key={user.position}
+                  setNewOrderOfUsers={setNewOrderOfUsers}
+                  usersListLength={usersList.length - 1}
+                  index={index}
+                />
+              ))}
           </Table>
         </>
       )}

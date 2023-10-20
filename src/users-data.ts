@@ -1112,8 +1112,7 @@ const data = {
       },
       ein: "55-4062919",
       ssn: "551-74-1349",
-      userAgent:
-        "Mozilla/5.0 (Windows NT 5.1; rv:31.0) Gecko/20100101 Firefox/31.0",
+      userAgent: "Mozilla/5.0 (Windows NT 5.1; rv:31.0) Gecko/20100101 Firefox/31.0",
     },
     {
       id: 19,
