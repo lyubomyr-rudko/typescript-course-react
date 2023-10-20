@@ -1,5 +1,4 @@
 import { ChangeEvent, FormEvent, useEffect, useState } from "react";
-import { TUser } from "../users-data";
 import {
   AddNewUserForm,
   Button,
@@ -78,6 +77,8 @@ const emptyUser = {
   ssn: "",
   userAgent: "",
 };
+
+type TUser = typeof emptyUser;
 
 interface IUserProps {
   data: TUser;
