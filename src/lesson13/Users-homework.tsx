@@ -1,5 +1,6 @@
 import usersData from "../users-data";
 import { TUser } from "../users-data";
+import { Container, Header, TableRow, TableRowHeader, TableCell, Table, CircleHairColor } from "./Users-homework.styled";
 
 interface IUserProps {
   data: TUser;
@@ -14,10 +15,21 @@ interface IUserProps {
 const User = (props: IUserProps) => {
   const { data } = props;
 
+  function convertDate(inputDate:string){
+    const date = new Date(inputDate);
+    return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+  }
+
   return (
-    <li>
-      {data.firstName} {data.lastName}
-    </li>
+    <TableRow>
+      <TableCell>{`${data.firstName} ${data.lastName}`}</TableCell>
+      <TableCell>{data.gender}</TableCell>
+      <TableCell>
+        <CircleHairColor $inputColor={data.hair.color}/>
+      </TableCell>
+      <TableCell>{convertDate(data.birthDate)}</TableCell>
+      <TableCell>{data.phone}</TableCell>
+    </TableRow>
   );
 };
 
@@ -29,11 +41,22 @@ export function Users() {
   // TODO: Add your styled-components to src/lesson13/Users-homework.styled.tsx
 
   return (
-    <ul>
-      {usersData.map((user) => (
-        <User data={user} key={user.id} />
-      ))}
-    </ul>
+    <Container>
+      <Header>Users</Header>
+      <Table>
+        <TableRowHeader>
+          <TableCell>User Name</TableCell>
+          <TableCell>Gender</TableCell>
+          <TableCell>Hair Color</TableCell>
+          <TableCell>Birth date</TableCell>
+          <TableCell>Phone number</TableCell>
+        </TableRowHeader>
+
+        {usersData.map((user) => (
+          <User data={user} key={user.id} />
+        ))}
+      </Table>
+    </Container>
   );
 }
 
