@@ -1,6 +1,6 @@
-// import { useId, useState } from "react";
+import { useId, useState } from "react";
 import "./App.css";
-import { CustomHookDemo } from "./lesson15/CustomHookDemo";
+// import { CustomHookDemo } from "./lesson15/CustomHookDemo";
 // import { UseDeferredValueDemo } from "./lesson16/UseDeferredValueDemo";
 // import { UseReducerDemo } from "./lesson16/UseReducerDemo";
 // import { UseIdDemo } from "./lesson16/UseIdDemo";
@@ -12,14 +12,33 @@ import { CustomHookDemo } from "./lesson15/CustomHookDemo";
 // import { Users } from "./lesson15/UseContextDemo";
 // import { StateProvider } from "./lesson15/StateContext";
 
+import UseCallbackExample from "./lesson16/HW/UseCallbackExample/UseCallbackExample";
+import UseEffectExample from "./lesson16/HW/UseEffectExample/UseEffectExample";
+import UseStateExample from "./lesson16/HW/UseStateExample/UseStateExample";
+import ExampleProvider from "./lesson16/HW/UseContextExample/ExampleProvider";
+import UseContextDemo from "./lesson16/HW/UseContextExample/UseContextDemo";
+
 // interface IUserForm {
 //   email: string;
 //   password: string;
 // }
 
 export function App() {
+
   return (
     <>
+      <ExampleProvider>
+        <UseCallbackExample />
+        <br />
+        <UseEffectExample />
+        <br />
+        <UseStateExample />
+        <br />
+        <UseContextDemo />
+      </ExampleProvider>
+
+
+
       {/* <LoginForm onSubmit={console.log} /> */}
       {/* <UseRefDemo /> */}
       {/* <UseMemoDemo /> */}
@@ -38,7 +57,7 @@ export function App() {
       {/* <UseDeferredValueDemo /> */}
 
       {/* <UseReducerDemo /> */}
-      <CustomHookDemo />
+      {/* <CustomHookDemo /> */}
     </>
   );
 }
