@@ -1,6 +1,7 @@
 // import { useId, useState } from "react";
 import "./App.css";
-import { CustomHookDemo } from "./lesson15/CustomHookDemo";
+import { HomeWork16 } from "./lesson16/HomeWork16";
+//import { CustomHookDemo } from "./lesson15/CustomHookDemo";
 // import { UseDeferredValueDemo } from "./lesson16/UseDeferredValueDemo";
 // import { UseReducerDemo } from "./lesson16/UseReducerDemo";
 // import { UseIdDemo } from "./lesson16/UseIdDemo";
@@ -38,7 +39,7 @@ export function App() {
       {/* <UseDeferredValueDemo /> */}
 
       {/* <UseReducerDemo /> */}
-      <CustomHookDemo />
+      <HomeWork16/>
     </>
   );
 }
