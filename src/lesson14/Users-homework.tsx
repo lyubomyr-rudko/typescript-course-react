@@ -1,4 +1,13 @@
-import { ChangeEvent, FormEvent, useEffect, useState } from "react";
+import {
+  ChangeEvent,
+  FormEvent,
+  memo,
+  useCallback,
+  useDeferredValue,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import {
   AddNewUserForm,
   Button,
@@ -9,6 +18,7 @@ import {
   InfoWrapper,
   Legend,
   Loading,
+  TBody,
   Table,
   TableFieldWrapper,
 } from "./Users-homework.styled";
@@ -77,9 +87,11 @@ const emptyUser = {
   ssn: "",
   userAgent: "",
 };
-
 type TUser = typeof emptyUser;
-
+interface ISlowListProps {
+  text: string;
+  data: TUser[];
+}
 interface IUserProps {
   data: TUser;
   index: number;
@@ -93,27 +105,64 @@ interface IFormProps {
   handleNewUserChangeHairColor: (e: ChangeEvent<HTMLSelectElement>) => void;
   handleNewUserChangeGender: (e: ChangeEvent<HTMLInputElement>) => void;
   setNewUser: (user: TUser | null) => void;
+  handleBirthDateChange: (newValue: string) => void;
+  userBirthDate: string;
+  userLastName: string;
+  handleLastNameChange: (newValue: string) => void;
 }
-// # Users list and form with api
+interface ILastNameInputsProps {
+  value: string;
+  handleLastNameChange: (newValue: string) => void;
+}
+interface IBirthDateInputsProps {
+  value: string;
+  handleBirthDateChange: (newValue: string) => void;
+}
 
-// 1. Update User list component to fetch data from api ++
-// 2. Add loading state to User list component (show loading message while list is loading) ++
-// 3. Add buttons to move user up/down the list, store position in db json (add position field to each of the users) ++
-// 4. Add form component to create new user shown as modal. Show form on click on the button "Add new user"
-// 5. Form to create user needs to have the following inputs
-//    1. User first name (text input) ++
-//    2. User last name (text input) ++
-//    3. User hair color (select input) ++
-//    4. User birthDate (datetime input) ++
-//    5. User is female (checkbox input) ++
-//    6. User email (email input) ++
-// 6. Add form validation to the form component
-//    1. User first name is required ++
-//    2. User last name is required ++
-//    3. User email is required and should be valid email ++
-//    4. User birthDate is required and should be valid date ++
-// 7. Form submit button of the form component should be disabled if form is invalid ++
-// 8. Show error message for invalid fields ++
+const LastNameInput: React.FC<ILastNameInputsProps> = memo(
+  (props) => {
+    const { value: lastName, handleLastNameChange } = props;
+    console.log("LastNameInput render", lastName);
+    return (
+      <input
+        type="text"
+        value={lastName}
+        onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleLastNameChange(e.target.value)}
+        name="birthDate"
+        placeholder="Last Name"
+        required
+      />
+    );
+  },
+  (prevProps, nextProps) => {
+    return (
+      prevProps.value === nextProps.value &&
+      prevProps.handleLastNameChange === nextProps.handleLastNameChange
+    );
+  }
+);
+
+const BirthDateInput: React.FC<IBirthDateInputsProps> = memo(
+  (props) => {
+    const { value: birthDate, handleBirthDateChange } = props;
+    console.log("BirthDateInput render", birthDate);
+    return (
+      <input
+        type="date"
+        value={birthDate}
+        onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleBirthDateChange(e.target.value)}
+        name="birthDate"
+        required
+      />
+    );
+  },
+  (prevProps, nextProps) => {
+    return (
+      prevProps.value === nextProps.value &&
+      prevProps.handleBirthDateChange === nextProps.handleBirthDateChange
+    );
+  }
+);
 
 const Form = (props: IFormProps) => {
   const {
@@ -123,15 +172,24 @@ const Form = (props: IFormProps) => {
     handleNewUserChangeHairColor,
     handleNewUserChangeGender,
     setNewUser,
+    handleBirthDateChange,
+    userBirthDate,
+    userLastName,
+    handleLastNameChange,
   } = props;
+
+  const ref = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    ref?.current?.focus();
+  }, []);
 
   const formFields = [
     newUser?.firstName,
-    newUser?.lastName,
+    userLastName,
     newUser?.gender,
     newUser?.email,
     newUser?.hair?.color,
-    newUser?.birthDate,
+    userBirthDate,
   ];
   const formInvalid = formFields.some((field) => field === "");
 
@@ -162,18 +220,12 @@ const Form = (props: IFormProps) => {
           value={newUser.firstName}
           required
           placeholder="First Name"
+          ref={ref}
         />
       </FormFieldWrapper>
       <FormFieldWrapper>
         <Legend>Last Name</Legend>
-        <input
-          type="text"
-          onChange={handleNewUserChangeInfo}
-          name="lastName"
-          value={newUser.lastName}
-          required
-          placeholder="Last Name"
-        />
+        <LastNameInput value={userLastName} handleLastNameChange={handleLastNameChange} />
       </FormFieldWrapper>
       <FormFieldWrapper>
         <Legend>Color of hair</Legend>
@@ -190,13 +242,7 @@ const Form = (props: IFormProps) => {
       </FormFieldWrapper>
       <FormFieldWrapper>
         <Legend>Birthdate</Legend>
-        <input
-          type="date"
-          onChange={handleNewUserChangeInfo}
-          value={newUser.birthDate}
-          name="birthDate"
-          required
-        />
+        <BirthDateInput value={userBirthDate} handleBirthDateChange={handleBirthDateChange} />
       </FormFieldWrapper>
       <FormFieldWrapper>
         <Legend>Email</Legend>
@@ -238,26 +284,17 @@ const Form = (props: IFormProps) => {
 
 const User = (props: IUserProps) => {
   const { data, usersListLength, index, setNewOrderOfUsers } = props;
+  const style = useMaleOlder30(data);
   return (
     <>
-      <TableFieldWrapper>
+      <TableFieldWrapper {...style}>
         <InfoWrapper>
-          <li>
-            {data.firstName} {data.lastName}
-          </li>
+          {data.firstName} {data.lastName}
         </InfoWrapper>
-        <InfoWrapper>
-          <li>{data.gender}</li>
-        </InfoWrapper>
-        <InfoWrapper>
-          <li>{data.email}</li>
-        </InfoWrapper>
-        <InfoWrapper>
-          <li>{data.birthDate}</li>
-        </InfoWrapper>
-        <InfoWrapper>
-          <HairType color={data.hair.color}></HairType>
-        </InfoWrapper>
+        <InfoWrapper>{data.gender}</InfoWrapper>
+        <InfoWrapper>{data.email}</InfoWrapper>
+        <InfoWrapper>{data.birthDate}</InfoWrapper>
+        <HairType color={data.hair.color}></HairType>
         <InfoWrapper>
           <Button disabled={index <= 0} onClick={() => setNewOrderOfUsers(data.position, -1)}>
             Up
@@ -274,10 +311,81 @@ const User = (props: IUserProps) => {
   );
 };
 
+const SlowList = (props: ISlowListProps) => {
+  const { data, text } = props;
+  const filteredUsersByFirstName: TUser[] = [];
+  if (text !== "") {
+    data.forEach((user) => {
+      if (user.firstName.toLowerCase().startsWith(text.toLowerCase())) {
+        for (let i = 0; i < 100; i++) {
+          filteredUsersByFirstName.push(user);
+        }
+      }
+    });
+  }
+  function setNewOrderOfUsers() {
+    console.log(filteredUsersByFirstName);
+  }
+  return (
+    <>
+      {filteredUsersByFirstName.map((user, index) => (
+        <User
+          data={user}
+          usersListLength={filteredUsersByFirstName.length - 1}
+          index={index}
+          setNewOrderOfUsers={setNewOrderOfUsers}
+          key={index}
+        />
+      ))}
+    </>
+  );
+};
+
+type TUseUserWithBlackHair = (user: TUser) => { style: { backgroundColor: string } };
+const useMaleOlder30: TUseUserWithBlackHair = (user) => {
+  const now = new Date().getTime();
+  const userAge = Date.parse(user.birthDate);
+  const correctAgeOfUser = Math.floor((now - userAge) / (1000 * 60 * 60 * 24 * 30 * 12));
+  const backGroundColor =
+    correctAgeOfUser > 30 && user.gender === "male"
+      ? { backgroundColor: "gold" }
+      : { backgroundColor: "transparent" };
+  return { style: backGroundColor };
+};
+
 export function Users() {
   const [usersList, setUsersList] = useState<TUser[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [newUser, setNewUser] = useState<TUser | null>(null);
+  const [searchValue, setSearchValue] = useState<string>("");
+  const [userBirthDate, setUserBirthDate] = useState<string>("");
+  const [userLastName, setUserLastName] = useState<string>("");
+  const countOfLoadings = useRef<number>(0);
+  // 1.Під час пошуку через SearchValue , useDeferredValue почне відображати value input не чекаючи завершення виконання обчислення, що гарно для швидкодії компонента.
+  const deferredSearchValue = useDeferredValue(searchValue);
+  // 2.Перед визовом функції перевіряється, чи викликалась  функція раніше:
+  // якщо не викликалась, то функція викликається, і результат її виконання зберігається;
+  // якщо викликалась, то використовується збереженний результат.
+  // useCallback приймає в якості аргументів встроенний колбек і массив залежностей.
+  //  Повертає мемоізованну версію колбека, котрий зміниться тільки, якщо зміняться значення однієї із залежностей
+  // 3. useRef поверне змінний об'єкт рефу, властивість "сurrent" якого ініціалізується переданим аргументом ( initialValue ).
+  //  Повернутий об'єкт буде зберігатись протягом всього часу життя компонента. По суті, useRef — це “коробка”, що може містити змінне значення у власній властивості
+  // Я виконав у двух варіантах , 1) Рахувати кількість загрузок 2) при кожному відкритті форми ставити фокус на First Name input.
+  // 4. CustomHook "useMaleOlder30" Змінює backgroundColor колонки у юзера якому за 30 років і він чоловік;
+  const handleBirthDateChange = useCallback(
+    (newValue: string): void => setUserBirthDate(newValue),
+    [setUserBirthDate]
+  );
+  const handleLastNameChange = useCallback(
+    (newValue: string): void => setUserLastName(newValue),
+    [setUserLastName]
+  );
+
+  function setLoadingAndCount() {
+    setIsLoading(true);
+    countOfLoadings.current++;
+  }
+
   const later = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
   const fetchUsers = async () => {
@@ -289,7 +397,7 @@ export function Users() {
   useEffect(() => {
     async function loadUsers() {
       try {
-        setIsLoading(true);
+        setLoadingAndCount();
         fetchUsers();
         await later(1500);
       } catch (e) {
@@ -305,13 +413,14 @@ export function Users() {
   const addNewUser = () => {
     setNewUser({ ...emptyUser, position: usersList.length + 1, id: usersList.length + 1 });
   };
+
   async function setNewOrderOfUsers(position: number, number: -1 | 1) {
     const user = usersList.find((user) => user.position === position);
     if (!user) return null;
     const user2 = usersList.find((user) => user.position === position + number);
     if (!user2) return null;
     try {
-      setIsLoading(true);
+      setLoadingAndCount();
       await fetch(`http://localhost:3004/users/${user.id}`, {
         method: "PATCH",
         headers: {
@@ -339,17 +448,18 @@ export function Users() {
       setIsLoading(false);
     }
   }
+
   async function handleFormSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (!newUser) return null;
     try {
-      setIsLoading(true);
+      setLoadingAndCount();
       await fetch(`http://localhost:3004/users`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(newUser),
+        body: JSON.stringify({ ...newUser, birthDate: userBirthDate, lastName: userLastName }),
       });
       fetchUsers();
       await later(500);
@@ -361,17 +471,18 @@ export function Users() {
       setNewUser(null);
     }
   }
+
   const handleNewUserChangeInfo = (e: ChangeEvent<HTMLInputElement>) => {
     if (!newUser) {
       return;
     }
     setNewUser({ ...newUser, [e.target.name]: e.target.value });
   };
+
   const handleNewUserChangeHairColor = (e: ChangeEvent<HTMLSelectElement>) => {
     if (!newUser) {
       return;
     }
-    console.log(e.target.value);
     setNewUser({
       ...newUser,
       hair: {
@@ -380,6 +491,7 @@ export function Users() {
       },
     });
   };
+
   const handleNewUserChangeGender = (e: ChangeEvent<HTMLInputElement>) => {
     if (!newUser) {
       return;
@@ -397,11 +509,11 @@ export function Users() {
     }
     return 0;
   }
-  console.log(usersList);
+
   return (
     <>
       {isLoading ? (
-        <Loading>Loading</Loading>
+        <Loading>Loading № {countOfLoadings.current}</Loading>
       ) : (
         <>
           {newUser && (
@@ -412,32 +524,46 @@ export function Users() {
                 handleNewUserChangeInfo={handleNewUserChangeInfo}
                 handleNewUserChangeHairColor={handleNewUserChangeHairColor}
                 handleNewUserChangeGender={handleNewUserChangeGender}
+                handleBirthDateChange={handleBirthDateChange}
                 setNewUser={setNewUser}
+                userBirthDate={userBirthDate}
+                userLastName={userLastName}
+                handleLastNameChange={handleLastNameChange}
               />
             </FormWrapper>
           )}
           <Table>
-            <TableFieldWrapper>
+            <caption>
               <Button onClick={addNewUser} disabled={newUser !== null}>
                 Add new User
               </Button>
-            </TableFieldWrapper>
-            <TableFieldWrapper>
-              {tableHeaders.map((header) => (
-                <HeaderWrapper key={header}>{header}</HeaderWrapper>
-              ))}
-            </TableFieldWrapper>
-            {usersList
-              .sort((a, b) => compare(a.position, b.position))
-              .map((user, index) => (
-                <User
-                  data={user}
-                  key={user.position}
-                  setNewOrderOfUsers={setNewOrderOfUsers}
-                  usersListLength={usersList.length - 1}
-                  index={index}
-                />
-              ))}
+              <input
+                type="text"
+                placeholder="...search"
+                onChange={(e) => setSearchValue(e.target.value)}
+                value={searchValue}
+              />
+            </caption>
+            <TBody>
+              <TableFieldWrapper>
+                {tableHeaders.map((header) => (
+                  <HeaderWrapper key={header}>{header}</HeaderWrapper>
+                ))}
+              </TableFieldWrapper>
+              <SlowList text={deferredSearchValue} data={usersList} />
+              {searchValue === "" &&
+                usersList
+                  .sort((a, b) => compare(a.position, b.position))
+                  .map((user, index) => (
+                    <User
+                      data={user}
+                      key={user.position + index}
+                      setNewOrderOfUsers={setNewOrderOfUsers}
+                      usersListLength={usersList.length - 1}
+                      index={index}
+                    />
+                  ))}
+            </TBody>
           </Table>
         </>
       )}

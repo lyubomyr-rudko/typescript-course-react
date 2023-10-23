@@ -4,12 +4,15 @@ interface IBlockProps {
   color: string;
 }
 
-export const HairType = styled.div<IBlockProps>`
-  font-weight: bold;
+export const HairType = styled.td<IBlockProps>`
+  box-sizing: border-box;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid black;
   color: pink;
   width: 25px;
   aspect-ratio: 1/1;
-  border-radius: 50%;
+  margin: 5px;
   background-color: ${(props) =>
     props.color === "Blond"
       ? "#b38b67"
@@ -20,11 +23,14 @@ export const HairType = styled.div<IBlockProps>`
       : props.color};
 `;
 
-export const Table = styled.ul`
+export const Table = styled.table`
   display: flex;
   justify-content: center;
-  flex-direction: column;
   align-items: center;
+  flex-direction: column;
+`;
+export const TBody = styled.tbody`
+  text-align: center;
 `;
 export const Loading = styled.div`
   position: absolute;
@@ -67,23 +73,17 @@ export const Legend = styled.legend`
   color: white;
 `;
 
-export const TableFieldWrapper = styled.div`
-  display: flex;
-  width: 100%;
+export const TableFieldWrapper = styled.tr`
   justify-content: center;
 `;
-export const InfoWrapper = styled.div`
-  display: flex;
-  width: 250px;
+export const InfoWrapper = styled.td`
   box-sizing: border-box;
   justify-content: center;
   align-items: center;
   border: 1px solid black;
   padding: 5px 3px;
 `;
-export const HeaderWrapper = styled.div`
-  display: flex;
-  width: 250px;
+export const HeaderWrapper = styled.th`
   box-sizing: border-box;
   justify-content: center;
   align-items: center;
@@ -96,11 +96,10 @@ export const HeaderWrapper = styled.div`
 `;
 
 export const Button = styled.button`
-  width: 75%;
   font-weight: 600;
   border-radius: 10px;
   margin: 3px 3px;
-  padding: 3px 0;
+  padding: 5px;
   border: 2px solid black;
   background-color: gainsboro;
 `;

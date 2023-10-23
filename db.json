@@ -64,7 +64,7 @@
     },
     {
       "id": 2,
-      "position": 2,
+      "position": 5,
       "firstName": "Sheldon",
       "lastName": "Quigley",
       "maidenName": "Cole",
@@ -188,7 +188,7 @@
     },
     {
       "id": 4,
-      "position": 4,
+      "position": 2,
       "firstName": "Miles",
       "lastName": "Cummerata",
       "maidenName": "Maggio",
@@ -250,7 +250,7 @@
     },
     {
       "id": 5,
-      "position": 5,
+      "position": 4,
       "firstName": "Mavis",
       "lastName": "Schultz",
       "maidenName": "Yundt",
@@ -1861,7 +1861,7 @@
     },
     {
       "id": 31,
-      "position": 30,
+      "position": 31,
       "firstName": "Philip",
       "lastName": "Harmash",
       "maidenName": "",
