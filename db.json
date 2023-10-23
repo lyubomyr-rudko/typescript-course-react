@@ -2,7 +2,7 @@
   "users": [
     {
       "id": 1,
-      "position": 3,
+      "position": 1,
       "firstName": "Terry",
       "lastName": "Medhurst",
       "maidenName": "Smitham",
@@ -64,7 +64,7 @@
     },
     {
       "id": 2,
-      "position": 1,
+      "position": 2,
       "firstName": "Sheldon",
       "lastName": "Quigley",
       "maidenName": "Cole",
@@ -126,7 +126,7 @@
     },
     {
       "id": 3,
-      "position": 2,
+      "position": 3,
       "firstName": "Terrill",
       "lastName": "Hills",
       "maidenName": "Hoeger",
@@ -1799,7 +1799,7 @@
     },
     {
       "id": 30,
-      "position": 31,
+      "position": 30,
       "firstName": "Maurine",
       "lastName": "Stracke",
       "maidenName": "Abshire",

@@ -20,6 +20,18 @@ export class UserClass extends React.Component<IUserProps, IUserState> {
     }));
   };
 
+  // componentDidMount() {
+  //   console.log("UserClass mount");
+  // }
+
+  // componentDidUpdate(prevProps: Readonly<IUserProps>, prevState: Readonly<IUserState>, snapshot?: any): void {
+
+  // }
+
+  // shouldComponentUpdate(nextProps: Readonly<IUserProps>, nextState: Readonly<IUserState>, nextContext: any): boolean {
+  //   return true;
+  // }
+
   render() {
     const {
       data: { firstName, age, gender },

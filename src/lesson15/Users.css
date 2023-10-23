@@ -1,0 +1,10 @@
+.error {
+    font-weight: bold;
+    color: pink;
+}
+
+.danger {
+    font-weight: bold;
+    color: red;
+}
+
