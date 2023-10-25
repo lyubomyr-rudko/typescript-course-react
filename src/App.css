@@ -2,3 +2,7 @@
   height: 32px;
   border-bottom: 1px solid #eaecef;
 }
+
+#root {
+  margin: 40px;
+}
