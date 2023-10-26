@@ -1,8 +1,24 @@
-import usersData from "../users-data";
-import { TUser } from "../users-data";
+import { useEffect, useState } from "react";
+import { CSSProperties } from "styled-components";
+import { apiUsersUpdateAll } from './apiUsers.ts'
+import { UserForm } from "./UserForm.tsx";
+import { ModalWindowWrapper } from "./ModalWindowWrapper.tsx";
+
+export type TUser = {
+  id:string,
+  firstName:string,
+  lastName:string,
+  hairColor?: string,
+  birthDate:string,
+  email:string,
+  gender: "male" | "female",
+  position?:number
+}
 
 interface IUserProps {
-  data: TUser;
+  data: TUser,
+  handleMoveDown:(user:TUser)=>void,
+  handleMoveUp:(user:TUser)=>void
 }
 
 // # Users list and form with api
@@ -27,22 +43,128 @@ interface IUserProps {
 // 8. Show error message for invalid fields
 
 const User = (props: IUserProps) => {
-  const { data } = props;
+  const { data, handleMoveUp, handleMoveDown } = props;
+
+  const userStyle:CSSProperties = {
+    display: "flex",
+    flexDirection:"row",
+    gap:"5px",
+    padding:"5px"
+  }
 
   return (
-    <li>
-      {data.firstName} {data.lastName}
+    <li style={userStyle}>
+      <span>
+        {data.firstName} {data.lastName}
+      </span>
+
+      <div>
+        <button onClick={()=>handleMoveUp(data as TUser)}>MoveUp</button>
+        <button onClick={()=>handleMoveDown(data as TUser)}>MoveDown</button>
+      </div>
     </li>
   );
 };
 
 export function Users() {
+  const [usersData, setUsersData] = useState<TUser[]>([])
+  const [isLoading, setIsLoading] = useState(false)
+  const [isModalWindowHidden, setIsModalWindowHidden] = useState<boolean>(true)
+
+  function delay(ms: number) {
+    return new Promise( resolve => setTimeout(resolve, ms) );
+  }
+
+  useEffect(()=>{
+    async function fetchUsers(){
+      try{
+        const response = await fetch("http://localhost:3000/users")
+        const data = await response.json();
+  
+        await delay(2000)
+  
+        if(data){
+          setUsersData(data)
+        }
+      } catch(e){
+        console.error("Error in Users component line 56", e)
+      }
+    }
+    
+    async function addUserPosition() {
+      for(const user of usersData){
+        if(!user.position){
+          user.position = usersData.findIndex((element)=>user.id===element.id)
+        }
+      }
+    }
+
+    async function initializeUsersComponent() {
+      setIsLoading(true)
+      
+      await fetchUsers()
+      await addUserPosition()
+      await apiUsersUpdateAll(usersData)
+
+      setIsLoading(false)
+    }
+
+    initializeUsersComponent()
+  }, [])
+
+  const handleMoveDown = (user:TUser)=>{
+    const targetUserIndex:number = usersData.findIndex((element)=>user.id == element.id)
+
+    if(usersData.length>2 && targetUserIndex+1 < usersData.length){
+      const resultingUserArray:TUser[] = [...usersData];
+
+      [resultingUserArray[targetUserIndex], resultingUserArray[targetUserIndex+1]] = [resultingUserArray[targetUserIndex+1], resultingUserArray[targetUserIndex]]
+
+      setUsersData(resultingUserArray)
+    }
+  }
+
+  const handleMoveUp = (user:TUser)=>{
+    const targetUserIndex:number = usersData.findIndex((element)=>user.id == element.id)
+
+    if(usersData.length>2 && targetUserIndex > 0){
+      const resultingUserArray:TUser[] = [...usersData];
+
+      [resultingUserArray[targetUserIndex-1], resultingUserArray[targetUserIndex]] = [resultingUserArray[targetUserIndex], resultingUserArray[targetUserIndex-1]]
+
+      setUsersData(resultingUserArray)
+    }
+  }
+
+  const MainContainerStyles:CSSProperties = {
+    display:"flex",
+    flexDirection:"row",
+    alignItems:"start",
+    margin:"10px"
+  }
+
+  const handleIsHidden = ()=>{
+    setIsModalWindowHidden(!isModalWindowHidden)
+  }
+
   return (
-    <ul>
-      {usersData.map((user) => (
-        <User data={user} key={user.id} />
-      ))}
-    </ul>
+    <div style={MainContainerStyles}>
+      <ul>
+      {
+        isLoading === true && (usersData.length === 0) 
+          ? "Loading..."
+            : isLoading === false && (usersData.length === 0)
+              ? "Connection error or no data"
+                : usersData?.map((user) => (
+                  <User data={user} key={user.id} handleMoveDown={handleMoveDown} handleMoveUp={handleMoveUp}/>
+                ))
+      }
+      </ul>
+
+      {isLoading === false ? <button className="github-btn" onClick={handleIsHidden}>Add New User</button> : ""}
+
+      <ModalWindowWrapper isHidden={isModalWindowHidden} handleIsHidden={handleIsHidden}/>
+    </div>
   );
 }
 
