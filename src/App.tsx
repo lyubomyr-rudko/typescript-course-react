@@ -1,8 +1,16 @@
+import { useState } from "react";
 import "./App.css";
-import { Users } from "./lesson13/Users";
+import { Users } from "./lesson14/Users";
 
 export function App() {
-  return <Users />;
+  const [show, setShow] = useState(true);
+
+  return (
+    <>
+      <button onClick={() => setShow(!show)}>Toggle</button>
+      {show ? <Users /> : null}
+    </>
+  );
 }
 
 export default App;
