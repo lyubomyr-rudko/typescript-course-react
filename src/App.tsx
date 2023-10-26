@@ -1,10 +1,10 @@
 import "./App.css";
-import { Users } from "./lesson14/Users-homework";
+import { Lesson17Homework } from "./lesson17-homework";
 
 export function App() {
   return (
     <>
-      <Users />
+      <Lesson17Homework />
     </>
   );
 }

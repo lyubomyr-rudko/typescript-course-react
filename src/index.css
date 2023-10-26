@@ -28,3 +28,12 @@ body {
   min-height: 100vh;
 }
 
+fieldset.filter {
+  margin-bottom: 16px;
+  display: block;
+}
+
+fieldset.filter label {
+  display: inline-block;
+  margin-right: 8px;
+}
