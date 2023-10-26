@@ -119,7 +119,7 @@ interface IBirthDateInputsProps {
   handleBirthDateChange: (newValue: string) => void;
 }
 
-const LastNameInput: React.FC<ILastNameInputsProps> = memo(
+const LastNameInput = memo<ILastNameInputsProps>(
   (props) => {
     const { value: lastName, handleLastNameChange } = props;
     console.log("LastNameInput render", lastName);
@@ -142,7 +142,7 @@ const LastNameInput: React.FC<ILastNameInputsProps> = memo(
   }
 );
 
-const BirthDateInput: React.FC<IBirthDateInputsProps> = memo(
+const BirthDateInput = memo<IBirthDateInputsProps>(
   (props) => {
     const { value: birthDate, handleBirthDateChange } = props;
     console.log("BirthDateInput render", birthDate);
