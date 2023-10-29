@@ -1882,7 +1882,7 @@ function deepFreeze(object: any) {
   return Object.freeze(object);
 }
 
-export type TUser = (typeof data.users)[0];
+export type TUser = (typeof data.users)[0] & { isLike: boolean };
 
 const freezedData = deepFreeze(data);
 
