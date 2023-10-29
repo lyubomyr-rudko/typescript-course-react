@@ -1,14 +1,12 @@
-interface IUserProps {
-  // TOOD: feel free to update this interface
-  data: {
-    firstName: string;
-    lastName: string;
-    id: string;
-  };
-}
+import { useSelector } from 'react-redux';
+import { useAppDispatch } from './store/hooks';
+import { EGenderFilter, EAgeFilter, EColorFilter, TUSer } from "./store/ts/usersTypes";
+import { isLoading, getAge, getColor, getGender, getUsersSelector } from "./store/selectort/usersSelector";
+import { setAgeAction,setColorAction, setGenderAction , getUsersAction, deLeteUserAction} from './store/actions/usersAction';
 
-const User = (props: IUserProps) => {
-  const { data } = props;
+const User = (props: {data:TUSer, deleteUser:(id:number)=>void}) => {
+  const {data, deleteUser} = props
+  
   // TODO: use db.json file to store data, use json-server to implement api
   // TODO: use redux-toolkit to implement state to fetch and update users, with redux thunk for async actions
   // TODO: use redux slice to generate actions and reducers, create selectors to implement all the logic.
@@ -27,99 +25,111 @@ const User = (props: IUserProps) => {
       <span>
         {data.firstName} {data.lastName}
       </span>
+      <button onClick={()=>{deleteUser(data.id)}}>Delete</button>
     </li>
+    
   );
 };
 
 export function Users() {
-  const users: IUserProps["data"][] = [
-    { firstName: "John", lastName: "Doe", id: "1" },
-    { firstName: "Jane", lastName: "Doe", id: "2" },
-    { firstName: "John", lastName: "Smith", id: "3" },
-  ];
+  const dispatch = useAppDispatch();
+  const age = useSelector(getAge);
+  const color = useSelector(getColor);
+  const gender = useSelector(getGender);
+  const users = useSelector(getUsersSelector);
+  const loading = useSelector(isLoading);
 
+  const isGenderChecked = (val:EGenderFilter):boolean=>{
+    if(val === gender)return true;
+    return false
+  }
+  const changeGender = (val:EGenderFilter)=>{
+    dispatch(setGenderAction(val));
+  }
+  const isColorChecked = (val:EColorFilter):boolean=>{
+    if(val === color)return true;
+    return false
+  }
+  const changeColor = (val:EColorFilter)=>{
+    dispatch(setColorAction(val))
+  }
+  const isAgeChecked = (val:EAgeFilter):boolean=>{
+    if(val === age)return true;
+    return false
+  }
+  const changeAge = (val:EAgeFilter)=>{
+    dispatch(setAgeAction(val))
+  }
+  const getUsers = ()=>{
+    dispatch(getUsersAction());
+  }
+  const deleteUser =(id:number)=>{
+    dispatch(deLeteUserAction(id));
+  }
   return (
     <>
+    <button onClick={getUsers}>Get data</button>
       <form>
         <fieldset className="filter">
           <legend>Filter by gender</legend>
-
-          <label>
-            <input type="radio" name="gender" value="female" /> Gender - Female
-          </label>
-
-          <label>
-            <input type="radio" name="gender" value="male" /> Gender - Male
-          </label>
-
-          <label>
-            <input type="radio" name="gender" value="all" /> Gender - All
-          </label>
+          {Object.keys(EGenderFilter).map((key) => (
+            <label key={key}>
+              <input 
+              type="radio" 
+              name="gender" 
+              value={EGenderFilter[key as keyof typeof EGenderFilter]} 
+              checked={isGenderChecked(EGenderFilter[key as keyof typeof EGenderFilter])}
+              onChange={()=>{changeGender(EGenderFilter[key as keyof typeof EGenderFilter])}}
+              /> 
+              Gender - {EGenderFilter[key as keyof typeof EGenderFilter]}
+            </label>
+          ))}
         </fieldset>
 
         <fieldset className="filter">
           <legend>Filter by eye color</legend>
-
-          <label>
-            <input type="radio" name="eyeColor" value="green" />
-            Eye Color - Green
-          </label>
-
-          <label>
-            <input type="radio" name="eyeColor" value="brown" />
-            Eye Color - Brown
-          </label>
-
-          <label>
-            <input type="radio" name="eyeColor" value="gray" />
-            Eye Color - Gray
-          </label>
-
-          <label>
-            <input type="radio" name="eyeColor" value="blue" />
-            Eye Color - Blue
-          </label>
-
-          <label>
-            <input type="radio" name="eyeColor" value="amber" />
-            Eye Color - Amber
-          </label>
-
-          <label>
-            <input type="radio" name="eyeColor" value="all" />
-            Eye Color - All
-          </label>
+          {Object.keys(EColorFilter).map((key) => (
+            <label key={key}>
+              <input 
+              type="radio" 
+              name="color" 
+              value={EColorFilter[key as keyof typeof EColorFilter]} 
+              checked={isColorChecked(EColorFilter[key as keyof typeof EColorFilter])}
+              onChange={()=>{changeColor(EColorFilter[key as keyof typeof EColorFilter])}}
+              /> 
+              Eye Color - {EColorFilter[key as keyof typeof EColorFilter]}
+            </label>
+          ))}
         </fieldset>
 
         <fieldset className="filter">
           <legend>Filter by age</legend>
-
-          <label>
-            <input type="radio" name="age" value="less20" />
-            Age - Less then 20
-          </label>
-
-          <label>
-            <input type="radio" name="age" value="20to40" />
-            Age - From 20 to 40
-          </label>
-
-          <label>
-            <input type="radio" name="age" value="more40" />
-            Age - More than 40
-          </label>
-
-          <label>
-            <input type="radio" name="age" value="all" />
-            Age - all
-          </label>
+          {Object.keys(EAgeFilter).map((key) => (
+            <label key={key}>
+              <input 
+              type="radio" 
+              name="age" 
+              value={EAgeFilter[key as keyof typeof EAgeFilter]} 
+              checked={isAgeChecked(EAgeFilter[key as keyof typeof EAgeFilter])}
+              onChange={()=>{changeAge(EAgeFilter[key as keyof typeof EAgeFilter])}}
+              /> 
+              Age - {EAgeFilter[key as keyof typeof EAgeFilter]}
+            </label>
+          ))}
         </fieldset>
       </form>
-      <ul>
-        {users.map((user) => (
-          <User data={user} key={user.id} />
-        ))}
-      </ul>
+      {loading?'loading...':
+      
+        users.length===0?'No data':
+          <ul>
+            {users.map((user) => (
+                  <User data={user} key={user.id} deleteUser={deleteUser}/>
+                ))}
+          </ul>
+        
+        
+      }
+      
     </>
   );
 }
