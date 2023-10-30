@@ -84,19 +84,6 @@ const User = (props: IUserProps) => {
   const { data } = props;
   const dispatch = useAppDispatch();
 
-  // TODO: use db.json file to store data, use json-server to implement api
-  // TODO: use redux-toolkit to implement state to fetch and update users, with redux thunk for async actions
-  // TODO: use redux slice to generate actions and reducers, create selectors to implement all the logic.
-  // TODO: do not use useState to store data locally, use redux store instead
-  // TODO: do not filter data locally, use redux selectors instead
-  // TODO: use nested selectors to filter data
-  // TODO: move all data-related logic (filtering) to redux store
-
-  // TODO: add logic to like user(s)
-  // TODO: add logic to delete user(s)
-  // TODO: add lotic to filter users
-  // TODO: do not focus on styling
-
   return (
     <li>
       <span>
@@ -118,6 +105,9 @@ export function Users() {
   const loading = useSelector((state: RootState) => selectLoadingState(state));
   const filteredUsers = useSelector((state: RootState) => selectFilteredUsers(state));
   const later = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+  const genders = ["female", "male", "all"];
+  const eyeColors = ["Green", "Brown", "Gray", "Blue", "Amber", "all"];
+  const ages = ["less20", "20to40", "more40", "all"];
 
   useEffect(() => {
     async function loadUsers() {
@@ -153,102 +143,40 @@ export function Users() {
           <form style={{ margin: 20 }}>
             <fieldset className="filter">
               <legend>Filter by gender</legend>
-
-              <label>
-                <input type="radio" name="gender" value="female" onChange={handleFilterByGender} />
-                Gender - Female
-              </label>
-
-              <label>
-                <input type="radio" name="gender" value="male" onChange={handleFilterByGender} />
-                Gender - Male
-              </label>
-
-              <label>
-                <input type="radio" name="gender" value="all" onChange={handleFilterByGender} />
-                Gender - All
-              </label>
+              {genders.map((gender) => (
+                <label>
+                  <input
+                    type="radio"
+                    name="gender"
+                    value={gender}
+                    onChange={handleFilterByGender}
+                  />
+                  Gender - {gender}
+                </label>
+              ))}
             </fieldset>
             <fieldset className="filter">
               <legend>Filter by eye color</legend>
-
-              <label>
-                <input
-                  type="radio"
-                  name="eyeColor"
-                  value="Green"
-                  onChange={handleFilterByEyeColor}
-                />
-                Eye Color - Green
-              </label>
-
-              <label>
-                <input
-                  type="radio"
-                  name="eyeColor"
-                  value="Brown"
-                  onChange={handleFilterByEyeColor}
-                />
-                Eye Color - Brown
-              </label>
-
-              <label>
-                <input
-                  type="radio"
-                  name="eyeColor"
-                  value="Gray"
-                  onChange={handleFilterByEyeColor}
-                />
-                Eye Color - Gray
-              </label>
-
-              <label>
-                <input
-                  type="radio"
-                  name="eyeColor"
-                  value="Blue"
-                  onChange={handleFilterByEyeColor}
-                />
-                Eye Color - Blue
-              </label>
-
-              <label>
-                <input
-                  type="radio"
-                  name="eyeColor"
-                  value="Amber"
-                  onChange={handleFilterByEyeColor}
-                />
-                Eye Color - Amber
-              </label>
-
-              <label>
-                <input type="radio" name="eyeColor" value="all" onChange={handleFilterByEyeColor} />
-                Eye Color - All
-              </label>
+              {eyeColors.map((color) => (
+                <label>
+                  <input
+                    type="radio"
+                    name="eyeColor"
+                    value={color}
+                    onChange={handleFilterByEyeColor}
+                  />
+                  Eye Color - {color}
+                </label>
+              ))}
             </fieldset>
             <fieldset className="filter">
               <legend>Filter by age</legend>
-
-              <label>
-                <input type="radio" name="age" value="less20" onChange={handleFilterByEyAge} />
-                Age - Less then 20
-              </label>
-
-              <label>
-                <input type="radio" name="age" value="20to40" onChange={handleFilterByEyAge} />
-                Age - From 20 to 40
-              </label>
-
-              <label>
-                <input type="radio" name="age" value="more40" onChange={handleFilterByEyAge} />
-                Age - More than 40
-              </label>
-
-              <label>
-                <input type="radio" name="age" value="all" onChange={handleFilterByEyAge} />
-                Age - all
-              </label>
+              {ages.map((age) => (
+                <label>
+                  <input type="radio" name="age" value={age} onChange={handleFilterByEyAge} />
+                  Age - {age}
+                </label>
+              ))}
             </fieldset>
           </form>
           <div style={{ margin: 20 }}>
