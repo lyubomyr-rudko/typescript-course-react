@@ -1,11 +1,9 @@
 import "./App.css";
-import { Lesson17Homework } from "./lesson17-homework";
+import { Lesson16Homework } from "./lesson16-homework";
 
 export function App() {
   return (
-    <>
-      <Lesson17Homework />
-    </>
+    <Lesson16Homework />
   );
 }
 
