@@ -1,127 +1,255 @@
-interface IUserProps {
-  // TOOD: feel free to update this interface
-  data: {
-    firstName: string;
-    lastName: string;
-    id: string;
-  };
-}
+import React, { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 
-const User = (props: IUserProps) => {
-  const { data } = props;
-  // TODO: use db.json file to store data, use json-server to implement api
-  // TODO: use redux-toolkit to implement state to fetch and update users, with redux thunk for async actions
-  // TODO: use redux slice to generate actions and reducers, create selectors to implement all the logic.
-  // TODO: do not use useState to store data locally, use redux store instead
-  // TODO: do not filter data locally, use redux selectors instead
-  // TODO: use nested selectors to filter data
-  // TODO: move all data-related logic (filtering) to redux store
+import { IFilter, IRadioProps, IUserProps } from './types';
+import {
+    deleteUser,
+    fetchUsers,
+    filterUser,
+    likeUser,
+} from './redux/users/operations';
+import { selectAllUsers } from './redux/users/selectors';
+import { useAppDispatch } from './redux/store';
 
-  // TODO: add logic to like user(s)
-  // TODO: add logic to delete user(s)
-  // TODO: add lotic to filter users
-  // TODO: do not focus on styling
+import { UsersList, UserItem } from './Users-homework.styled';
 
-  return (
-    <li>
-      <span>
-        {data.firstName} {data.lastName}
-      </span>
-    </li>
-  );
+const User = ({ data }: IUserProps) => {
+    const { id, firstName, lastName, gender, eyeColor, age, isLiked } = data;
+    const dispatch = useAppDispatch();
+
+    const handleLike = () => {
+        dispatch(likeUser({ id, isLiked: !isLiked }));
+    };
+
+    const handleDelete = () => {
+        dispatch(deleteUser(id));
+    };
+
+    return (
+        <UserItem>
+            <button onClick={handleLike}>
+                <i
+                    className="fa fa-heart"
+                    style={{ color: isLiked ? 'red' : 'white' }}
+                ></i>
+            </button>
+            <button onClick={handleDelete}>Del</button>
+            <span>
+                {firstName} {lastName},
+            </span>
+            <span>gender: {gender},</span>
+            <span>age: {age},</span>
+            <span>eyeColor: {eyeColor}</span>
+        </UserItem>
+    );
 };
 
-export function Users() {
-  const users: IUserProps["data"][] = [
-    { firstName: "John", lastName: "Doe", id: "1" },
-    { firstName: "Jane", lastName: "Doe", id: "2" },
-    { firstName: "John", lastName: "Smith", id: "3" },
-  ];
+function RadioInput({ label, setFilter, ...props }: IRadioProps) {
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        if (name === 'age') {
+            switch (value) {
+                case 'less20':
+                    setFilter((prev) => ({
+                        ...prev,
+                        age_lte: 20,
+                        age_gte: undefined,
+                    }));
+                    break;
 
-  return (
-    <>
-      <form>
-        <fieldset className="filter">
-          <legend>Filter by gender</legend>
+                case '20to40':
+                    setFilter((prev) => ({
+                        ...prev,
+                        age_lte: 40,
+                        age_gte: 20,
+                    }));
+                    break;
 
-          <label>
-            <input type="radio" name="gender" value="female" /> Gender - Female
-          </label>
+                case 'more40':
+                    setFilter((prev) => ({
+                        ...prev,
+                        age_lte: undefined,
+                        age_gte: 40,
+                    }));
+                    break;
 
-          <label>
-            <input type="radio" name="gender" value="male" /> Gender - Male
-          </label>
+                default:
+                    setFilter((prev) => ({
+                        ...prev,
+                        age_lte: undefined,
+                        age_gte: undefined,
+                    }));
+            }
+        } else if (value === 'all') {
+            setFilter((prev) => ({ ...prev, [name]: undefined }));
+        } else {
+            setFilter((prev) => ({ ...prev, [name]: value }));
+        }
+    };
 
-          <label>
-            <input type="radio" name="gender" value="all" /> Gender - All
-          </label>
-        </fieldset>
-
-        <fieldset className="filter">
-          <legend>Filter by eye color</legend>
-
-          <label>
-            <input type="radio" name="eyeColor" value="green" />
-            Eye Color - Green
-          </label>
-
-          <label>
-            <input type="radio" name="eyeColor" value="brown" />
-            Eye Color - Brown
-          </label>
-
-          <label>
-            <input type="radio" name="eyeColor" value="gray" />
-            Eye Color - Gray
-          </label>
-
-          <label>
-            <input type="radio" name="eyeColor" value="blue" />
-            Eye Color - Blue
-          </label>
-
-          <label>
-            <input type="radio" name="eyeColor" value="amber" />
-            Eye Color - Amber
-          </label>
-
-          <label>
-            <input type="radio" name="eyeColor" value="all" />
-            Eye Color - All
-          </label>
-        </fieldset>
-
-        <fieldset className="filter">
-          <legend>Filter by age</legend>
-
-          <label>
-            <input type="radio" name="age" value="less20" />
-            Age - Less then 20
-          </label>
-
-          <label>
-            <input type="radio" name="age" value="20to40" />
-            Age - From 20 to 40
-          </label>
-
-          <label>
-            <input type="radio" name="age" value="more40" />
-            Age - More than 40
-          </label>
-
-          <label>
-            <input type="radio" name="age" value="all" />
-            Age - all
-          </label>
-        </fieldset>
-      </form>
-      <ul>
-        {users.map((user) => (
-          <User data={user} key={user.id} />
-        ))}
-      </ul>
-    </>
-  );
+    return (
+        <label>
+            <input onChange={handleChange} {...props} /> {label}
+        </label>
+    );
 }
 
-export default Users;
+function convertFilterToURLSearchParams<T extends IFilter>(filter: T) {
+    const params = new URLSearchParams();
+
+    for (const key in filter) {
+        if (filter[key]) {
+            params.append(key, filter[key] as string);
+        }
+    }
+
+    return params.toString();
+}
+
+function Users() {
+    const [filter, setFilter] = useState<IFilter>({});
+    const [params, setParams] = useState<string>('');
+    const users = useSelector(selectAllUsers);
+    const dispatch = useAppDispatch();
+
+    useEffect(() => {
+        setParams(convertFilterToURLSearchParams(filter));
+    }, [filter]);
+
+    useEffect(() => {
+        (async () => {
+            if (params.length < 1) {
+                dispatch(fetchUsers());
+            } else {
+                dispatch(filterUser(params));
+            }
+        })();
+    }, [dispatch, params]);
+
+    return (
+        <>
+            <form>
+                <fieldset className="filter">
+                    <legend>Filter by gender</legend>
+                    <RadioInput
+                        setFilter={setFilter}
+                        type="radio"
+                        name="gender"
+                        value="female"
+                        label="Gender - Female"
+                    />
+                    <RadioInput
+                        setFilter={setFilter}
+                        type="radio"
+                        name="gender"
+                        value="male"
+                        label="Gender - Male"
+                    />
+                    <RadioInput
+                        setFilter={setFilter}
+                        type="radio"
+                        name="gender"
+                        value="all"
+                        label="Gender - All"
+                    />
+                </fieldset>
+
+                <fieldset className="filter">
+                    <legend>Filter by eye color</legend>
+                    <RadioInput
+                        setFilter={setFilter}
+                        type="radio"
+                        name="eyeColor"
+                        label="Eye Color - Green"
+                        value="Green"
+                    />
+                    <RadioInput
+                        setFilter={setFilter}
+                        type="radio"
+                        name="eyeColor"
+                        label="Eye Color - Brown"
+                        value="Brown"
+                    />
+                    <RadioInput
+                        setFilter={setFilter}
+                        type="radio"
+                        name="eyeColor"
+                        label="Eye Color - Gray"
+                        value="Gray"
+                    />
+                    <RadioInput
+                        setFilter={setFilter}
+                        type="radio"
+                        name="eyeColor"
+                        label="Eye Color - Blue"
+                        value="Blue"
+                    />
+                    <RadioInput
+                        setFilter={setFilter}
+                        type="radio"
+                        name="eyeColor"
+                        label="Eye Color - Amber"
+                        value="Amber"
+                    />
+                    <RadioInput
+                        setFilter={setFilter}
+                        type="radio"
+                        name="eyeColor"
+                        label="Eye Color - All"
+                        value="all"
+                    />
+                </fieldset>
+
+                <fieldset className="filter">
+                    <legend>Filter by age</legend>
+                    <RadioInput
+                        setFilter={setFilter}
+                        type="radio"
+                        name="age"
+                        label="Age - Less then 20"
+                        value="less20"
+                    />
+                    <RadioInput
+                        setFilter={setFilter}
+                        type="radio"
+                        name="age"
+                        label="Age - From 20 to 40"
+                        value="20to40"
+                    />
+                    <RadioInput
+                        setFilter={setFilter}
+                        type="radio"
+                        name="age"
+                        label="Age - More than 40"
+                        value="more40"
+                    />
+                    <RadioInput
+                        setFilter={setFilter}
+                        type="radio"
+                        name="age"
+                        label="Age - all"
+                        value="all"
+                    />
+                </fieldset>
+            </form>
+            <UsersList>
+                {users.map((user) => (
+                    <User data={user} key={user.id} />
+                ))}
+            </UsersList>
+        </>
+    );
+}
+
+const UsersPage = () => {
+    const dispatch = useAppDispatch();
+    useEffect(() => {
+        (async () => {
+            dispatch(fetchUsers());
+        })();
+    }, [dispatch]);
+
+    return <Users />;
+};
+
+export default UsersPage;
