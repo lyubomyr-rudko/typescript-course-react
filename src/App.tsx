@@ -1,12 +1,14 @@
-import "./App.css";
-import { Lesson17Homework } from "./lesson17-homework";
+import UsersPage from './lesson17-homework/Users-homework';
+import { Provider } from 'react-redux';
 
-export function App() {
-  return (
-    <>
-      <Lesson17Homework />
-    </>
-  );
-}
+import { store } from './lesson17-homework/redux/store';
+
+const App = () => {
+    return (
+        <Provider store={store}>
+            <UsersPage />
+        </Provider>
+    );
+};
 
 export default App;

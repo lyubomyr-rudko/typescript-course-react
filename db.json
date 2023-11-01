@@ -308,7 +308,8 @@
       },
       "ein": "18-7178563",
       "ssn": "667-98-5357",
-      "userAgent": "Mozilla/5.0 (Windows NT 6.0) AppleWebKit/535.1 (KHTML, like Gecko) Chrome/13.0.782.1 Safari/535.1"
+      "userAgent": "Mozilla/5.0 (Windows NT 6.0) AppleWebKit/535.1 (KHTML, like Gecko) Chrome/13.0.782.1 Safari/535.1",
+      "isLiked": false
     },
     {
       "id": 6,
@@ -494,7 +495,8 @@
       },
       "ein": "88-4396827",
       "ssn": "238-41-5528",
-      "userAgent": "Mozilla/5.0 (X11; Linux amd64) AppleWebKit/534.36 (KHTML, like Gecko) Chrome/13.0.766.0 Safari/534.36"
+      "userAgent": "Mozilla/5.0 (X11; Linux amd64) AppleWebKit/534.36 (KHTML, like Gecko) Chrome/13.0.766.0 Safari/534.36",
+      "isLiked": false
     },
     {
       "id": 9,
