@@ -8,10 +8,14 @@ import {
     filterUser,
     likeUser,
 } from './redux/users/operations';
-import { selectAllUsers } from './redux/users/selectors';
+import {
+    selectAllUsers,
+    selectError,
+    selectIsLoading,
+} from './redux/users/selectors';
 import { useAppDispatch } from './redux/store';
 
-import { UsersList, UserItem } from './Users-homework.styled';
+import { UsersList, UserItem, Loader } from './Users-homework.styled';
 
 const User = ({ data }: IUserProps) => {
     const { id, firstName, lastName, gender, eyeColor, age, isLiked } = data;
@@ -243,13 +247,20 @@ function Users() {
 
 const UsersPage = () => {
     const dispatch = useAppDispatch();
+    const isLoading = useSelector(selectIsLoading);
+
     useEffect(() => {
         (async () => {
             dispatch(fetchUsers());
         })();
     }, [dispatch]);
 
-    return <Users />;
+    return (
+        <>
+            {isLoading && <Loader />}
+            <Users />
+        </>
+    );
 };
 
 export default UsersPage;
