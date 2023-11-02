@@ -122,12 +122,7 @@ export function Users() {
     const asyncFetch = async () => {
       const response = await fetch(`http://localhost:3004/users/${count}`);
       const data = await response.json();
-
       setCurrentUser(data);
-
-      // fetch(`http://localhost:3004/users/${count}`)
-      //   .then((response) => response.json())
-      //   .then(setCurrentUser);
     };
     asyncFetch();
 
@@ -139,17 +134,12 @@ export function Users() {
   const fetchUsers = async () => {
     const response = await fetch("http://localhost:3004/users");
     const data = await response.json();
-
     setUsersList(data);
   };
 
   useEffect(() => {
     console.log("fetching users list");
-    fetchUsers();
-
-    // fetch("http://localhost:3004/users")
-    //   .then((response) => response.json())
-    //   .then(setUsersList);
+    fetchUsers(); 
 
     return () => {
       console.log("Users unmount");

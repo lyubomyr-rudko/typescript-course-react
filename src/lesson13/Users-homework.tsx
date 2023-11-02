@@ -1,39 +1,51 @@
 import usersData from "../users-data";
 import { TUser } from "../users-data";
+import { HairType, InfoWrapper, RowHeader, Table, TableRow } from "./Users-homework.styled";
 
+const categorys = [
+  { category: "firstName", text: "User Name" },
+  { category: "age", text: "Age" },
+  { category: "email", text: "Email" },
+  { category: "gender", text: "Gender" },
+  { category: "hair", text: "Hair Color" },
+  { category: "birthDate", text: "Birth Date" },
+  { category: "phone", text: "Phone Number" },
+] as const;
+
+type TCategory = Pick<
+  TUser,
+  "firstName" | "lastName" | "gender" | "birthDate" | "phone" | "hair" | "age" | "email"
+>;
 interface IUserProps {
   data: TUser;
+  category: keyof TCategory;
 }
-// TODO: Update User component to display user's name, Gender, Hair color, Birth dat and phone number
-// TODO: Style this component using styled-components
-// TODO: Use Users-homework.jpg or Users-homework.fig as a reference
-// TODO: Add a component to display user's hair color as a colored circle HairColorIcon
-// TODO: Add a color prop to HairColorIcon, so it can be used to display different colors
-// TODO: Add your styled-components to src/lesson13/Users-homework.styled.tsx
 
 const User = (props: IUserProps) => {
-  const { data } = props;
-
-  return (
-    <li>
-      {data.firstName} {data.lastName}
-    </li>
-  );
+  const { data, category } = props;
+  const info =
+    category === "firstName" ? (
+      data.lastName + " " + data.firstName
+    ) : category === "hair" ? (
+      <HairType color={data.hair.color}></HairType>
+    ) : (
+      data[category]
+    );
+  return <InfoWrapper>{info}</InfoWrapper>;
 };
 
 export function Users() {
-  // TOOD: update this component to display a header and a list of users
-  // User Name | Gender | Hair Color | Birth date | Phone number
-  // TODO: Style this component using styled-components
-  // TODO: Use Users-homework.jpg or Users-homework.fig as a reference
-  // TODO: Add your styled-components to src/lesson13/Users-homework.styled.tsx
-
   return (
-    <ul>
-      {usersData.map((user) => (
-        <User data={user} key={user.id} />
+    <Table>
+      {categorys.map((category, index) => (
+        <TableRow key={index}>
+          <RowHeader>{category.text}</RowHeader>
+          {usersData.map((user) => (
+            <User data={user} category={category.category} key={user.id} />
+          ))}
+        </TableRow>
       ))}
-    </ul>
+    </Table>
   );
 }
 
