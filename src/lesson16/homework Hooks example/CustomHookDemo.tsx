@@ -1,11 +1,8 @@
-import { useState } from "react";
-import { useLocalStorage } from "./CustomHook";
+import { useFetch } from "./CustomHook";
 
 // Пояснення
-// За допомогою хука useLocalStorage я дістаю вже разпарсане значення ,
-// а точніше юзерів, а функція перевіряє якщо з локалсторідж повернувся null то він підгружає с сервера i дані одразу сетає в локал сторідж, а якщо не null
-// то використовує що поверне нам хук.
-
+// За допомогою хука useFetch я фетчаю дату з переданої всередину url ,
+// і мені повертає обьект який одразу має поля data , loading , error
 const emptyUser = {
   id: 0,
   position: 0,
@@ -71,23 +68,19 @@ const emptyUser = {
 type TUser = typeof emptyUser;
 
 export function CustomHookDemo() {
-  const [usersList, setUsersList] = useState<TUser[]>([]);
-  const users = useLocalStorage("users123");
-  const fetchUsers = async () => {
-    if (!users) {
-      const response = await fetch("http://localhost:3004/users");
-      const data = await response.json();
-      localStorage.setItem("users123", JSON.stringify(data));
-      setUsersList(data);
-    } else setUsersList(users);
-  };
-
+  const { data, loading, error } = useFetch({ url: "http://localhost:3004/users" });
+  if (loading) return "Loading...";
+  if (error) {
+    throw new Error(`Something went wrong`);
+  }
+  if (data === undefined) return;
   return (
     <>
-      <button onClick={fetchUsers}>fetch Users</button>
-      {usersList.map((user, index) => (
-        <div key={index}>{user.lastName}</div>
-      ))}
+      <div>
+        {data.map((user: any) => (
+          <div key={user.birthDate}>{user.firstName}</div>
+        ))}
+      </div>
     </>
   );
 }
