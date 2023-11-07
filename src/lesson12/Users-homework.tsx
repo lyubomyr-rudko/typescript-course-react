@@ -1,30 +1,47 @@
-import React, { useCallback } from "react";
+import React from "react";
 import usersData from "../users-data";
 import { TUser } from "../users-data";
 
 interface IUserProps {
   data: {
+    id: number;
     firstName: string;
     lastName: string;
   };
+  onDelete: (id: number) => void;
+  onMoveUp: (id: number) => void;
+  onMoveDown: (id: number) => void;
 }
 
 const User = (props: IUserProps) => {
-  const { data } = props;
+  const { data, onDelete, onMoveUp, onMoveDown } = props;
+  const [like, setLike] = React.useState<boolean>(false)
+  function handleDelete() {
+    onDelete(data.id);
+  }
+ 
+  function handleLike() {
+    setLike(!like);
+  }
 
-  // TODO: add delete button to each of the user
-  // TODO: implement logic to delete user
+  function handleMoveUp() {
+    onMoveUp(data.id);
+  }
 
-  // TODO: add a Like button to each of the user
-  // TODO: add a state to keep liked state - is user liked or not (true/false) - useState, default value false
-  // TODO: implement logic to like user - click on the like button should change state of the user (liked/not liked
-  // TODO: display hart icon if user is liked (💝)
+  function handleMoveDown() {
+    onMoveDown(data.id);
+  }
 
   return (
     <li>
+      {like && <span>💝</span>}
       <span>
         {data.firstName} {data.lastName}
       </span>
+      <button onClick={handleLike}>Like</button>
+      <button onClick={handleDelete}>Delete</button>
+      <button onClick={handleMoveUp}>⬆️</button>
+      <button onClick={handleMoveDown}>⬇️</button>
     </li>
   );
 };
@@ -32,26 +49,31 @@ const User = (props: IUserProps) => {
 export function Users() {
   const [users, setUsers] = React.useState<TUser[]>(usersData);
 
-  const handleDelete = (user: TUser) => {
-    console.log("deleting", user);
-    // TODO: implement function to delete user
-    // TODO: create new list of users without deleted user
-    // TODO: call setUsers with new list of users
+  const handleDelete = (user: number) => {
+    setUsers(users.filter(el => el.id !== user));
   };
-  console.log(handleDelete, setUsers);
 
-  // TODO: pass handleDelete to User component
+  const handleMoveUp = (user: number) => {
+    const result = [...users];
+    const moved = users.filter(el => el.id === user);
+    result.splice(users.findIndex(el => el.id === user), 1);
+    result.splice(users.findIndex(el => el.id === user) - 1, 0, moved[0]);
+    setUsers(result);
+  }
 
-  // TODO: Add "Move Up" and "Move Down" buttons to each of the user
-  // TODO: Implement functions to move user up/down the list
-  // TODO: Make sure you create new list of users, do not mutate existing list
-  // TODO: Call setUsers with new list of users
-  // TODO: Pass handleMoveUp and handleMoveDown to User component as props
+  const handleMoveDown = (user: number) => {
+    const result = [...users];
+    const moved = users.filter(el => el.id === user);
+    result.splice(users.findIndex(el => el.id === user), 1);
+    result.splice(users.findIndex(el => el.id === user) + 1, 0, moved[0]);
+    setUsers(result);
+  }
+
 
   return (
     <ul>
       {users.map((user) => (
-        <User data={user} key={user.id} />
+        <User data={user} key={user.id} onDelete={handleDelete} onMoveUp={handleMoveUp} onMoveDown={handleMoveDown} />
       ))}
     </ul>
   );
